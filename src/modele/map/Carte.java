@@ -1,9 +1,9 @@
 /**
  * @author ABERKANE | HANNA | BELARBI | RODRIGUES DA COSTA
  *
- * BatailleNavaleECE
+ * BatailleNavale
  *
- * 27 nov. 2022
+ * 26 nov. 2022
  */
 package modele.map;
 
@@ -21,14 +21,14 @@ public class Carte {
 
 		blocs = new Bloc[nombreLigne][nombreColonne];
 
-		String indicePremiereColonne = " ,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o";
+		String indicePremiereColonne = "  , 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15";
 		String[] indiceColonneSplit = indicePremiereColonne.split(",");
 
 		for (int indiceLigne = 0; indiceLigne < nombreLigne; indiceLigne++) {
 			blocs[indiceLigne][0] = new Bloc(indiceColonneSplit[indiceLigne], indiceLigne, 0, false);
 		}
 
-		String indicePremiereLigne = " , 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15";
+		String indicePremiereLigne = "  , 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15";
 		String[] indiceLigneSplit = indicePremiereLigne.split(",");
 
 		for (int indiceColonne = 0; indiceColonne < nombreLigne; indiceColonne++) {
@@ -54,8 +54,8 @@ public class Carte {
 		return nombreColonne;
 	}
 
-	public Bloc getBloc(int line, int column) {
-		return blocs[line][column];
+	public Bloc getBloc(int ligne, int colonne) {
+		return blocs[ligne][colonne];
 	}
 
 	public void afficheCarte() {
@@ -68,17 +68,32 @@ public class Carte {
 	}
 
 	public void afficheCarteEnnemi(boolean modetriche) {
-		for (int i = 0; i < ConfigurationJeu.NB_LIGNE; i++) {
-			for (int j = 0; j < ConfigurationJeu.NB_COLONNE; j++) {
-				System.out.print("[" + blocs[i][j].getValeur() + "]");
+		if (modetriche) {
+			for (int i = 0; i < ConfigurationJeu.NB_LIGNE; i++) {
+				for (int j = 0; j < ConfigurationJeu.NB_COLONNE; j++) {
+					System.out.print("[" + blocs[i][j].getValeur() + "]");
+				}
+				System.out.println();
 			}
-			System.out.println();
+		} else {
+			for (int i = 0; i < ConfigurationJeu.NB_LIGNE; i++) {
+				for (int j = 0; j < ConfigurationJeu.NB_COLONNE; j++) {
+					if (i < 1 || j < 1) {
+						System.out.print("[" + blocs[i][j].getValeur() + "]");
+					} else if (blocs[i][j].isTouche()==true) {
+						System.out.print("[" + blocs[i][j].getValeur() + "]");
+					} else {
+						System.out.print("[XX]");
+					}
+				}
+				System.out.println();
+			}
 		}
 	}
 
-//	 public static void main(String [] main) {
-//	 Carte c = new Carte(ConfigurationJeu.NB_LIGNE,
-//	 ConfigurationJeu.NB_COLONNE);
-//	 c.afficheCarte();
-//	 }
+//	public static void main(String[] main) {
+//		Carte c = new Carte(ConfigurationJeu.NB_LIGNE, ConfigurationJeu.NB_COLONNE);
+//		c.afficheCarte();
+//	}
+
 }

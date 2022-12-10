@@ -1,9 +1,9 @@
 /**
  * @author ABERKANE | HANNA | BELARBI | RODRIGUES DA COSTA
  *
- * BatailleNavaleECE
+ * BatailleNavale
  *
- * 27 nov. 2022
+ * 26 nov. 2022
  */
 package modele.map;
 
@@ -24,6 +24,10 @@ public class Bloc {
 		return valeur;
 	}
 
+	public void setValeur(String valeur) {
+		this.valeur = valeur;
+	}
+
 	public int getLigne() {
 		return ligne;
 	}
@@ -32,12 +36,17 @@ public class Bloc {
 		return colonne;
 	}
 
-	public boolean getTouche() {
+	public boolean isTouche() {
 		return touche;
+	}
+
+	public void setTouche(boolean touche) {
+		this.touche = touche;
 	}
 
 	@Override
 	public String toString() {
-		return "Bloc [ligne=" + ligne + ", colonne=" + colonne + ", touche=" + touche + "]";
+		return "Bloc [valeur=" + valeur + ", ligne=" + ligne + ", colonne=" + colonne + ", touche=" + touche + "]";
 	}
+
 }

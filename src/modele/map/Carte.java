@@ -91,9 +91,9 @@ public class Carte {
 		}
 	}
 
-//	public static void main(String[] main) {
-//		Carte c = new Carte(ConfigurationJeu.NB_LIGNE, ConfigurationJeu.NB_COLONNE);
-//		c.afficheCarte();
-//	}
+	public static void main(String[] main) {
+		Carte c = new Carte(ConfigurationJeu.NB_LIGNE, ConfigurationJeu.NB_COLONNE);
+		c.afficheCarte();
+	}
 
 }

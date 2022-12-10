@@ -16,6 +16,17 @@ public class JeuUtilite {
         return (r.nextInt(2));
 	}
 	
+	public static int valeurAleatoire(int borneSup) {
+		Random r = new Random();
+		
+		return (r.nextInt(borneSup)+1);
+	}
+	
+	public static int valeurZeroAleatoire(int borneSup) {
+		Random r = new Random();
+		
+		return (r.nextInt(borneSup));
+	}
 	
 
 }

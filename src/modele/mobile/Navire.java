@@ -14,25 +14,27 @@ public class Navire {
 	protected int taille;
 	protected int impactMissile;
 	protected ArrayList<Coordonnees> listeCoordonnees;
-	protected boolean touche;
+	protected boolean coule;
 	protected int direction;
+	protected boolean touche;
 
 	/**
 	 * @param id
 	 * @param taille
 	 * @param impactMissile
 	 * @param listeCoordonnees
-	 * @param touche
+	 * @param coule
 	 * @param direction
 	 */
-	public Navire(int id, int taille, int impactMissile, ArrayList<Coordonnees> coordonnees, boolean touche,
-			int direction) {
+	public Navire(int id, int taille, int impactMissile, ArrayList<Coordonnees> coordonnees, boolean coule,
+			boolean touche, int direction ) {
 		this.id = id;
 		this.taille = taille;
 		this.impactMissile = impactMissile;
 		this.listeCoordonnees = coordonnees;
-		this.touche = touche;
+		this.coule = coule;
 		this.direction = direction;
+		this.touche = touche;
 	}
 
 	public int getId() {
@@ -51,12 +53,24 @@ public class Navire {
 		return listeCoordonnees;
 	}
 
-	public boolean isTouche() {
-		return touche;
+	public boolean isCoule() {
+		return coule;
+	}
+
+	public void setCoule(boolean coule) {
+		this.coule = coule;
 	}
 
 	public int getDirection() {
 		return direction;
+	}
+
+	public boolean isTouche() {
+		return touche;
+	}
+
+	public void setTouche(boolean touche) {
+		this.touche = touche;
 	}
 
 	public Coordonnees futuresCoordonneesValid(int directionDeplacement) {
@@ -66,7 +80,7 @@ public class Navire {
 		case 0: { // gauche
 			coordLigne = listeCoordonnees.get(0).getLigne();
 			coordColonne = listeCoordonnees.get(0).getColonne() - 1;
-			
+
 			break;
 		}
 		case 1: { // haut
@@ -143,7 +157,7 @@ public class Navire {
 	@Override
 	public String toString() {
 		return "\nNavire [id=" + id + ", taille=" + taille + ", impactMissile=" + impactMissile + ", listeCoordonnees="
-				+ listeCoordonnees + ", touche=" + touche + ", direction=" + direction + "]";
+				+ listeCoordonnees + ", coule=" + coule + ", direction=" + direction + "]";
 	}
 
 //	public static void main(String[] args) {

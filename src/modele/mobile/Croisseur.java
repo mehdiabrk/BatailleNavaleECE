@@ -18,12 +18,12 @@ public class Croisseur extends Navire {
 	 * @param taille
 	 * @param impactMissile
 	 * @param listeCoordonnees
-	 * @param touche
+	 * @param coule
 	 * @param direction
 	 */
-	public Croisseur(int id, int taille, int impactMissile, ArrayList<Coordonnees> coordonnees, boolean touche,
-			int direction) {
-		super(id, taille, impactMissile, coordonnees, touche, direction);
+	public Croisseur(int id, int taille, int impactMissile, ArrayList<Coordonnees> coordonnees, boolean coule,
+			boolean touche, int direction) {
+		super(id, taille, impactMissile, coordonnees, coule, touche, direction);
 		this.id = ConfigurationJeu.ID_CROISSEUR;
 		this.taille = ConfigurationJeu.TAILLE_CROISSEUR;
 		this.impactMissile = ConfigurationJeu.IMPACT_CROISSEUR;
@@ -32,7 +32,7 @@ public class Croisseur extends Navire {
 	@Override
 	public String toString() {
 		return "Croisseur [id=" + id + ", taille=" + taille + ", impactMissile=" + impactMissile + ", listeCoordonnees="
-				+ listeCoordonnees + ", touche=" + touche + ", direction=" + direction + "]";
+				+ listeCoordonnees + ", coule=" + coule + ", direction=" + direction + ", touche=" + touche + "]";
 	}
 
 }

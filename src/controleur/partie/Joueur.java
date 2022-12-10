@@ -30,6 +30,9 @@ public class Joueur {
 	private ArrayList<Coordonnees> listeCoordonneesFlotte;
 
 	private Flotte flotte;
+	
+	private int NbBlocTouche;
+	private int NbNavireCoule;
 
 	public Joueur(Carte carteJoueur, Carte carteRobot) {
 		this.carteJoueur = carteJoueur;
@@ -37,7 +40,10 @@ public class Joueur {
 		this.listeCoordonneesFlotte = new ArrayList<Coordonnees>();
 
 		this.flotte = generationFlotteAleatoire(carteJoueur);
-
+		placementFlotte();
+		
+		NbBlocTouche = 0;
+		NbNavireCoule = 0;
 	}
 
 	public Carte getCarteJoueur() {
@@ -56,7 +62,16 @@ public class Joueur {
 		return flotte;
 	}
 
+	public int getNbBlocTouche() {
+		return NbBlocTouche;
+	}
+
+	public int getNbNavireCoule() {
+		return NbNavireCoule;
+	}
+
 	public void modifValueBlocs(Coordonnees c, int id) {
+
 		int BlocLigne = c.getLigne();
 		int BlocColonne = c.getColonne();
 		String value = null;
@@ -207,7 +222,7 @@ public class Joueur {
 		ArrayList<Coordonnees> coordCuirasse = generationCoordonnees(ConfigurationJeu.TAILLE_CUIRASSE, direction);
 
 		Cuirasse cuirasse = new Cuirasse(ConfigurationJeu.ID_CUIRASSE, ConfigurationJeu.TAILLE_CUIRASSE,
-				ConfigurationJeu.IMPACT_CUIRASSE, coordCuirasse, false, direction);
+				ConfigurationJeu.IMPACT_CUIRASSE, coordCuirasse, false, false, direction);
 
 		return cuirasse;
 
@@ -219,7 +234,7 @@ public class Joueur {
 		ArrayList<Coordonnees> coordCroisseur = generationCoordonnees(ConfigurationJeu.TAILLE_CROISSEUR, direction);
 
 		Croisseur croisseur = new Croisseur(ConfigurationJeu.ID_CROISSEUR, ConfigurationJeu.TAILLE_CROISSEUR,
-				ConfigurationJeu.IMPACT_CROISSEUR, coordCroisseur, false, direction);
+				ConfigurationJeu.IMPACT_CROISSEUR, coordCroisseur, false, false, direction);
 
 		return croisseur;
 
@@ -242,7 +257,7 @@ public class Joueur {
 		ArrayList<Coordonnees> coordSousMarin = generationCoordonnees(ConfigurationJeu.TAILLE_SOUSMARIN, direction);
 
 		SousMarin sousMarin = new SousMarin(ConfigurationJeu.ID_SOUSMARIN, ConfigurationJeu.TAILLE_SOUSMARIN,
-				ConfigurationJeu.IMPACT_SOUSMARIN, coordSousMarin, false, direction);
+				ConfigurationJeu.IMPACT_SOUSMARIN, coordSousMarin, false, false, direction);
 
 		return sousMarin;
 	}
@@ -273,40 +288,144 @@ public class Joueur {
 		return new Flotte(listeNavire);
 	}
 
-	public void stockBlocTouche(Coordonnees coordonnees, int impact) {
+	public void stockBlocTouche(Coordonnees coordonnees, int impact, int id) {
 		int coordX = coordonnees.getLigne();
 		int coordY = coordonnees.getColonne();
-		System.err.println("IMPACT : " + impact);
+		
 		Carte carte = carteEnnemi;
 
+		Bloc b = null;
 		if (impact == 9) {
-			carte.getBloc(coordX, coordY).setTouche(true);
-			carte.getBloc(coordX - 1, coordY - 1).setTouche(true);
-			carte.getBloc(coordX + 1, coordY + 1).setTouche(true);
-			carte.getBloc(coordX + 1, coordY).setTouche(true);
-			carte.getBloc(coordX, coordY + 1).setTouche(true);
-			carte.getBloc(coordX - 1, coordY).setTouche(true);
-			carte.getBloc(coordX, coordY - 1).setTouche(true);
-			carte.getBloc(coordX + 1, coordY - 1).setTouche(true);
-			carte.getBloc(coordX - 1, coordY + 1).setTouche(true);
+			System.out.println("IMPACT DE : " + impact + " CASES !!!");
+			b = carte.getBloc(coordX, coordY);
+			b.setTouche(true);
+
+			b = carte.getBloc(coordX - 1, coordY - 1);
+			b.setTouche(true);
+
+			b = carte.getBloc(coordX + 1, coordY + 1);
+			b.setTouche(true);
+
+			b = carte.getBloc(coordX + 1, coordY);
+			b.setTouche(true);
+
+			b = carte.getBloc(coordX, coordY + 1);
+			b.setTouche(true);
+
+			b = carte.getBloc(coordX - 1, coordY);
+			b.setTouche(true);
+
+			b = carte.getBloc(coordX, coordY - 1);
+			b.setTouche(true);
+
+			b = carte.getBloc(coordX + 1, coordY - 1);
+			b.setTouche(true);
+
+			b = carte.getBloc(coordX - 1, coordY + 1);
+			b.setTouche(true);
+
 		} else if (impact == 4) {
-			carte.getBloc(coordX, coordY).setTouche(true);
-			carte.getBloc(coordX - 1, coordY).setTouche(true);
-			carte.getBloc(coordX + 1, coordY).setTouche(true);
-			carte.getBloc(coordX, coordY - 1).setTouche(true);
-			carte.getBloc(coordX, coordY + 1).setTouche(true);
+			System.out.println("IMPACT DE : " + impact + " CASES !!!");
+			b = carte.getBloc(coordX, coordY);
+			b.setTouche(true);
+
+			b = carte.getBloc(coordX - 1, coordY);
+			b.setTouche(true);
+
+			b = carte.getBloc(coordX + 1, coordY);
+			b.setTouche(true);
+
+			b = carte.getBloc(coordX, coordY - 1);
+			b.setTouche(true);
+
+			b = carte.getBloc(coordX, coordY + 1);
+			b.setTouche(true);
+		} else if (id == 3 && ConfigurationJeu.NB_FUSEE_ECLAIRANTE > 0) {
+			b = carte.getBloc(coordX, coordY);
+			b.setEclaire(true);
+
+			b = carte.getBloc(coordX - 1, coordY);
+			b.setEclaire(true);
+
+			b = carte.getBloc(coordX + 1, coordY);
+			b.setEclaire(true);
+
+			b = carte.getBloc(coordX, coordY - 1);
+			b.setEclaire(true);
+
+			b = carte.getBloc(coordX, coordY + 1);
+			b.setEclaire(true);
+			ConfigurationJeu.NB_FUSEE_ECLAIRANTE--;
 		} else {
-			carte.getBloc(coordX, coordY).setTouche(true);
+			System.out.println("IMPACT DE : " + impact + " CASES !!!");
+			b = carte.getBloc(coordX, coordY);
+			b.setTouche(true);
+
 		}
 
 	}
 
-	public void tirer(Coordonnees coordonnees, Navire navire) {
+	private Coordonnees decodeCoordonnees(String[] stringCoordonnes) {
+		String indiceLigneString = stringCoordonnes[0];
+		String indiceColonneString = stringCoordonnes[1];
+		int indiceColonne = Integer.parseInt(indiceColonneString);
 
-		int impact = navire.getImpactMissile();
+		Coordonnees c = null;
 
-		stockBlocTouche(coordonnees, impact);
+		int i = 0;
 
+		for (String string : ConfigurationJeu.INDICE_LIGNE.split(",")) {
+			if (indiceLigneString.equals(string)) {
+				c = new Coordonnees(i, indiceColonne);
+			}
+			i++;
+		}
+
+		return c;
+
+	}
+
+	public void updateNavireTouche(Coordonnees coordonnees) {
+		Bloc[][] blocs = carteJoueur.getBlocs();
+
+		ArrayList<Navire> listeNav = flotte.getListeNavire();
+
+		ArrayList<Coordonnees> listeCoord;
+
+		int verif;
+
+		for (int i = 0; i < listeNav.size(); i++) {
+			listeCoord = listeNav.get(i).getListeCoordonnees();
+			verif = 0;
+			for (int j = 0; j < listeCoord.size(); j++) {
+				int line = listeCoord.get(j).getLigne();
+				int colonne = listeCoord.get(j).getColonne();
+				if (blocs[line][colonne].isTouche()) {
+					verif++;
+				}
+			}
+			if (verif > 0) {
+				Navire navire = listeNav.get(i);
+				navire.setTouche(true);
+			}
+		}
+	}
+
+	public void tirer(String[] stringCoordonnes, int id) {
+
+		Coordonnees coordonnees = decodeCoordonnees(stringCoordonnes);
+
+		if (id == 1) {
+			stockBlocTouche(coordonnees, ConfigurationJeu.IMPACT_CUIRASSE, id);
+		} else if (id == 2) {
+			stockBlocTouche(coordonnees, ConfigurationJeu.IMPACT_CROISSEUR, id);
+		} else if (id == 3) {
+			stockBlocTouche(coordonnees, ConfigurationJeu.IMPACT_DESTROYER, id);
+		} else {
+			stockBlocTouche(coordonnees, ConfigurationJeu.IMPACT_SOUSMARIN, id);
+		}
+
+		updateNavireTouche(coordonnees);
 	}
 
 	public void MAJSigne(Navire navire) {
@@ -328,26 +447,27 @@ public class Joueur {
 			b.setValeur(value);
 		}
 	}
-	
-	public boolean deplacementCoherent(Navire navire,int directionDeplacement) {
+
+	public boolean deplacementCoherent(Navire navire, int directionDeplacement) {
+		ArrayList<Coordonnees> listeCoord = navire.getListeCoordonnees();
+		Coordonnees cDebut;
+		Coordonnees cFin;
 		if (navire.getDirection() == 0) {// 0 = horizontale
-			if (directionDeplacement == 0 || directionDeplacement == 2) {
-				System.out.println("Methode deplacementCoherent : True");
+			cDebut = listeCoord.get(0);
+			cFin = listeCoord.get(listeCoord.size() - 1);
+			if (directionDeplacement == 0 && cDebut.getColonne() != 0
+					|| directionDeplacement == 2 && cFin.getColonne() != ConfigurationJeu.NB_COLONNE - 2) {
 				return true;
 			} else {
-				System.err.println(
-						"Le bateau que vous avez choisi est a l'horizontale il ne peut donc pas se deplacer à la verticale");
-				System.out.println("Methode deplacementCoherent : False");
 				return false;
 			}
 		} else { // 1 = verticale
-			if (directionDeplacement == 1 || directionDeplacement == 3) {
-				System.out.println("Methode deplacementCoherent : True");
+			cDebut = listeCoord.get(0);
+			cFin = listeCoord.get(listeCoord.size() - 1);
+			if (directionDeplacement == 1 && cDebut.getLigne() != 0
+					|| directionDeplacement == 3 && cFin.getLigne() != ConfigurationJeu.NB_COLONNE - 2) {
 				return true;
 			} else {
-				System.err.println(
-						"Le bateau que vous avez choisi est a la verticale il ne peut donc pas se deplacer à l'horizontale");
-				System.out.println("Methode deplacementCoherent : False");
 				return false;
 			}
 		}
@@ -363,41 +483,41 @@ public class Joueur {
 
 		switch (directionDeplacement) {
 		case 0: { // gauche
-			
+
 			coordonneesDebutNavire = navire.getListeCoordonnees().get(0);
 			BlocLigne = coordonneesDebutNavire.getLigne();
 			BlocColonne = coordonneesDebutNavire.getColonne();
-			
+
 			futureCoordLigne = BlocLigne;
 			futureCoordColonne = BlocColonne - 1;
 
 			break;
 		}
 		case 1: { // haut
-			
+
 			coordonneesDebutNavire = navire.getListeCoordonnees().get(0);
 			BlocLigne = coordonneesDebutNavire.getLigne();
 			BlocColonne = coordonneesDebutNavire.getColonne();
-			
+
 			futureCoordLigne = BlocLigne - 1;
 			futureCoordColonne = BlocColonne;
 			break;
 		}
 		case 2: { // droite
-			
-			coordonneesDebutNavire = navire.getListeCoordonnees().get(navire.getTaille()-1);
+
+			coordonneesDebutNavire = navire.getListeCoordonnees().get(navire.getTaille() - 1);
 			BlocLigne = coordonneesDebutNavire.getLigne();
 			BlocColonne = coordonneesDebutNavire.getColonne();
-			
+
 			futureCoordLigne = BlocLigne;
 			futureCoordColonne = BlocColonne + 1;
 			break;
 		}
 		case 3: { // bas
-			coordonneesDebutNavire = navire.getListeCoordonnees().get(navire.getTaille()-1);
+			coordonneesDebutNavire = navire.getListeCoordonnees().get(navire.getTaille() - 1);
 			BlocLigne = coordonneesDebutNavire.getLigne();
 			BlocColonne = coordonneesDebutNavire.getColonne();
-			
+
 			futureCoordLigne = BlocLigne + 1;
 			futureCoordColonne = BlocColonne;
 			break;
@@ -406,27 +526,186 @@ public class Joueur {
 			throw new IllegalArgumentException("Unexpected value: " + directionDeplacement);
 		}
 
-		Bloc FutureBlocNavire= carteJoueur.getBloc(futureCoordLigne, futureCoordColonne);
-		System.out.println(FutureBlocNavire.toString());
+		Bloc FutureBlocNavire = carteJoueur.getBloc(futureCoordLigne, futureCoordColonne);
 
 		if (FutureBlocNavire.getValeur().equals("  ")) {
 			return true;
 		} else {
-			System.err.println("\nVotre deplacement est impossible car la case est déjà occupée");
 			return false;
 		}
 
 	}
 
-	public void deplacer(Navire navire, int directionDeplacement) {
-		if (deplacementCoherent(navire, directionDeplacement) ) {
-			if(checkBlocDisponible(navire, directionDeplacement)) {
-				DeleteSigne(navire);
-				navire.deplacer(directionDeplacement);
-				MAJSigne(navire);
+//	public void deplacer(Navire navire, int directionDeplacement) {
+//		if (deplacementCoherent(navire, directionDeplacement)) {
+//			if (checkBlocDisponible(navire, directionDeplacement)) {
+//				DeleteSigne(navire);
+//				navire.deplacer(directionDeplacement);
+//				MAJSigne(navire);
+//			}
+//		}
+//
+//	}
+
+	public boolean deplacer(int indiceNavire, int directionDeplacement) {
+		boolean verif = false;
+
+		Navire navire = flotte.getListeNavire().get(indiceNavire);
+		System.out.println(navire.toString());
+		if (!navire.isTouche()) {
+			if (deplacementCoherent(navire, directionDeplacement)) {
+				if (checkBlocDisponible(navire, directionDeplacement)) {
+					DeleteSigne(navire);
+					navire.deplacer(directionDeplacement);
+					MAJSigne(navire);
+					verif = true;
+				}
 			}
+		} else {
+			System.out.println("ATTENTION ! VOUS NE POUVEZ PAS DEPLACER UN NAVIRE TOUCHE !!!");
 		}
 
+		return verif;
+	}
+
+	public boolean verifExistListe(Coordonnees c2, ArrayList<Coordonnees> liste) {
+		int verif = 0;
+		for (Coordonnees c1 : liste) {
+			if (c1.verifCoord(c2)) {
+				verif++;
+			}
+		}
+		if (verif > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public int recupIndice(int CoordLigne, int CoordColonne) {
+		Coordonnees coordBloc = new Coordonnees(CoordLigne, CoordColonne);
+		ArrayList<Navire> listeNaviresFlottes = flotte.getListeNavire();
+
+		for (int i = 0; i < listeNaviresFlottes.size(); i++) {
+			if (verifExistListe(coordBloc, listeNaviresFlottes.get(i).getListeCoordonnees())) {
+				return i;
+			}
+		}
+		return 44;
+	}
+
+	public void afficheFlotteNumerote() {
+		Bloc[][] blocs = getCarteJoueur().getBlocs();
+
+		for (int i = 0; i < ConfigurationJeu.NB_LIGNE - 1; i++) {
+			for (int j = 0; j < ConfigurationJeu.NB_COLONNE - 1; j++) {
+				if (i < 1 || j < 1) {
+					System.out.print("[" + blocs[i][j].getValeur() + "]");
+				} else if (!blocs[i][j].getValeur().equals("  ") && !blocs[i][j].isTouche()) {
+					System.out.print("[0" + recupIndice(i, j) + "]");
+				} else if (blocs[i][j].isTouche()) {
+					System.out.print("[//]");
+				} else if (blocs[i][j].isCoule()) {
+					System.out.print("[::]");
+				}else {
+					System.out.print("[--]");
+				}
+			}
+			System.out.println();
+		}
+	}
+
+	public void afficheNbTouche() {
+		int nbAvantIncrement = this.NbBlocTouche;
+
+		incrementeNombreBlocTouche();
+		int nbApresIncrement = this.NbBlocTouche;
+
+		int difference = nbApresIncrement - nbAvantIncrement;
+
+		if (difference > 0) {
+			System.out.println("\nBRAVO !!! Vous avez touche " + difference + " bloc contenant un navire.");
+		} else {
+			System.out.println("\nVous n'avez touché aucun bloc contenant un navire.");
+		}
+
+	}
+
+	public void incrementeNombreBlocTouche() {
+		Bloc[][] blocs = carteEnnemi.getBlocs();
+
+		for (int i = 1; i < ConfigurationJeu.NB_LIGNE; i++) {
+			for (int j = 1; j < ConfigurationJeu.NB_COLONNE; j++) {
+				if (blocs[i][j].isTouche() && blocs[i][j].getValeur() != "  ") {
+					NbBlocTouche++;
+				}
+			}
+		}
+	}
+
+	public void verifNavireCoule() {
+		ArrayList<Navire> listeNav = flotte.getListeNavire();
+
+		Bloc[][] blocs = carteJoueur.getBlocs();
+
+		for (int i = 0; i < listeNav.size(); i++) {
+			ArrayList<Coordonnees> listeCoord = listeNav.get(i).getListeCoordonnees();
+			int sizeListeCoord = listeCoord.size();
+			int verif = 0;
+			for (int j = 0; j < sizeListeCoord; j++) {
+				int coordLigne = listeCoord.get(j).getLigne();
+				int coordColonne = listeCoord.get(j).getColonne();
+				if (blocs[coordLigne][coordColonne].isTouche()) {
+					verif++;
+				}
+			}
+			if (!listeNav.get(i).isCoule()) {
+				if (verif == sizeListeCoord) {
+					listeNav.get(i).setCoule(true);
+					System.out.println("BRAVO !!  Vous avez eliminer un Navire de l'ennemi");
+					NbNavireCoule++;
+					CouleSigne(listeNav.get(i));
+				}
+			}
+
+		}
+	}
+
+	public void ToucheSigne(Navire navire) {
+		String value = "//";
+		int BlocLigne = 0;
+		int BlocColonne = 0;
+		for (Coordonnees c : navire.getListeCoordonnees()) {
+
+			BlocLigne = c.getLigne();
+			BlocColonne = c.getColonne();
+
+			Bloc b = carteJoueur.getBloc(BlocLigne, BlocColonne);
+			b.setCoule(true);
+			b.setValeur(value);
+		}
+	}
+
+	public void CouleSigne(Navire navire) {
+		String value = "::";
+		int BlocLigne = 0;
+		int BlocColonne = 0;
+		for (Coordonnees c : navire.getListeCoordonnees()) {
+
+			BlocLigne = c.getLigne();
+			BlocColonne = c.getColonne();
+
+			Bloc b = carteJoueur.getBloc(BlocLigne, BlocColonne);
+			b.setCoule(true);
+			b.setValeur(value);
+		}
+	}
+
+	public boolean verifLoose() {
+		if (NbNavireCoule == 10) {
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -434,32 +713,169 @@ public class Joueur {
 		return "Joueur [carteJoueur=" + carteJoueur + ", carteEnnemi=" + carteEnnemi + ", flotte=" + flotte + "]";
 	}
 
-	public static void main(String[] args) {
-		Carte carteJoueur = new Carte(ConfigurationJeu.NB_LIGNE, ConfigurationJeu.NB_COLONNE);
-		Carte carteRobot = new Carte(ConfigurationJeu.NB_LIGNE, ConfigurationJeu.NB_COLONNE);
-
-		Joueur j = new Joueur(carteJoueur, carteRobot);
-
-		j.getCarteJoueur().afficheCarte();
-
-		System.out.println("\n-------------------------------------------------\n");
-
-		j.placementFlotte();
-
-		System.out.println("\n-------------------------------------------------\n");
-
-		j.carteJoueur.afficheCarte();
-
-		System.out.println("\n-------------------------------------------------\n");
-
-		ArrayList<Navire> copyFlotte = j.getFlotte().getListeNavire();
-
-		j.deplacer(copyFlotte.get(0), 3);
-
-		System.out.println("\n-------------------------------------------------\n");
-
-		j.carteJoueur.afficheCarte();
-
+	public String coupAleatoire() {
+		int valeurAleatoire = JeuUtilite.valeurAleatoire(2);
+		System.out.println(valeurAleatoire);
+		if (valeurAleatoire == 1) {
+			return "t";
+		} else {
+			return "d";
+		}
 	}
+
+	public String[] coordAleatoireSplit() {
+		int indiceLigneAleatoire = JeuUtilite.valeurAleatoire(ConfigurationJeu.NB_LIGNE - 2);
+		int indiceColonneAleatoire = JeuUtilite.valeurAleatoire(ConfigurationJeu.NB_COLONNE - 2);
+
+		String indiceLigne = ConfigurationJeu.INDICE_LIGNE;
+		String[] tabIndiceLigne = indiceLigne.split(",");
+
+		String indiceColonne = ConfigurationJeu.INDICE_COLONNE;
+		String[] tabIndiceColonne = indiceColonne.split(",");
+
+		String[] coordonneesSplit = { tabIndiceLigne[indiceLigneAleatoire], tabIndiceColonne[indiceColonneAleatoire] };
+		return coordonneesSplit;
+	}
+
+	public int idNavireAleatoire() {
+		return JeuUtilite.valeurAleatoire(9);
+	}
+
+	public String recupNomBateau(int id) {
+		if (id == 1) {
+			return ConfigurationJeu.NOM_CUIRASSE;
+		} else if (id == 2) {
+			return ConfigurationJeu.NOM_CROISSEUR;
+		} else if (id == 3) {
+			return ConfigurationJeu.NOM_DESTROYER;
+		} else {
+			return ConfigurationJeu.NOM_SOUSMARIN;
+		}
+	}
+
+	public int idNavireDeplacement() {
+		return JeuUtilite.valeurZeroAleatoire(10);
+	}
+
+	public int directionAleatoire() {
+		int direction = JeuUtilite.valeurZeroAleatoire(4);
+		System.out.println("DIRECTION ALEATOIRE TIREE : " + direction);
+		return direction;
+	}
+
+	public boolean checkDeplacement(int indiceNavire, int directionDeplacement) {
+		ArrayList<Navire> listeNav = flotte.getListeNavire();
+		System.out.println(listeNav);
+
+		Navire navire = listeNav.get(indiceNavire);
+
+		ArrayList<Coordonnees> listeCoord = navire.getListeCoordonnees();
+		Coordonnees cDebut;
+		Coordonnees cFin;
+		if (navire.getDirection() == 0) {// 0 = horizontale
+			cDebut = listeCoord.get(0);
+			cFin = listeCoord.get(listeCoord.size() - 1);
+			if (directionDeplacement == 0 && cDebut.getColonne() != 0
+					|| directionDeplacement == 2 && cFin.getColonne() != ConfigurationJeu.NB_COLONNE - 2) {
+				return true;
+			} else {
+				return false;
+			}
+		} else { // 1 = verticale
+			cDebut = listeCoord.get(0);
+			cFin = listeCoord.get(listeCoord.size() - 1);
+			if (directionDeplacement == 1 && cDebut.getLigne() != 0
+					|| directionDeplacement == 3 && cFin.getLigne() != ConfigurationJeu.NB_COLONNE - 2) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+
+	public boolean verifTouche(int indiceNavire) {
+		Navire navire = flotte.getListeNavire().get(indiceNavire);
+
+		if (navire.isTouche()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean verifCoule(int indiceNavire) {
+		Navire navire = flotte.getListeNavire().get(indiceNavire);
+
+		if (navire.isCoule()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean verifDeplacable(int indiceNavire) {
+		if ((verifTouche(indiceNavire) && verifCoule(indiceNavire)) || (verifCoule(indiceNavire) || verifTouche(indiceNavire) )) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	public boolean verifNavireDispo(int idNavire) {
+		ArrayList<Navire> listeNav = flotte.getListeNavire();
+		
+		int verif =0;
+		
+		for (Navire navire : listeNav) {
+			if(navire.getId() == idNavire) {
+				if(!navire.isCoule()) {
+					verif ++;
+				}
+			}
+		}
+		if(verif>0) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+
+//	public static void main(String[] args) {
+//		Carte carteJoueur = new Carte(ConfigurationJeu.NB_LIGNE, ConfigurationJeu.NB_COLONNE);
+//		Carte carteRobot = new Carte(ConfigurationJeu.NB_LIGNE, ConfigurationJeu.NB_COLONNE);
+//
+//		Joueur j = new Joueur(carteJoueur, carteRobot);
+//
+//		System.out.println("\n-------------------------------------------------\n");
+//
+//		j.carteJoueur.afficheCarte();
+//
+//		System.out.println("\n-------------------------------------------------\n");
+//
+//		j.carteJoueur.afficheCarteEnnemi(true);
+//
+//		System.out.println("\n-------------------------------------------------\n");
+//
+//		ArrayList<Navire> copyFlotte = j.getFlotte().getListeNavire();
+//
+//		String[] coordonnees = { "f", "05" };
+//		j.tirer(coordonnees, 3);
+//
+//		j.carteJoueur.afficheCarteEnnemi(false);
+//
+//		// TEST DEPLACEMENT
+//
+////		j.afficheFlotteNumerote();
+////		
+////		j.deplacer(1, 3);
+////		
+////		j.carteJoueur.afficheCarte();
+//
+////
+////		System.out.println("\n-------------------------------------------------\n");
+////
+////		j.carteJoueur.afficheCarte();
+//
+//	}
 
 }

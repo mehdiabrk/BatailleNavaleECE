@@ -18,12 +18,12 @@ public class SousMarin extends Navire {
 	 * @param taille
 	 * @param impactMissile
 	 * @param listeCoordonnees
-	 * @param touche
+	 * @param coule
 	 * @param direction
 	 */
-	public SousMarin(int id, int taille, int impactMissile, ArrayList<Coordonnees> coordonnees, boolean touche,
-			int direction) {
-		super(id, taille, impactMissile, coordonnees, touche, direction);
+	public SousMarin(int id, int taille, int impactMissile, ArrayList<Coordonnees> coordonnees, boolean coule,
+			boolean touche, int direction) {
+		super(id, taille, impactMissile, coordonnees, coule, touche, direction);
 		this.id = ConfigurationJeu.ID_SOUSMARIN;
 		this.taille = ConfigurationJeu.TAILLE_SOUSMARIN;
 		this.impactMissile = ConfigurationJeu.IMPACT_SOUSMARIN;
@@ -32,7 +32,7 @@ public class SousMarin extends Navire {
 	@Override
 	public String toString() {
 		return "SousMarin [id=" + id + ", taille=" + taille + ", impactMissile=" + impactMissile + ", listeCoordonnees="
-				+ listeCoordonnees + ", touche=" + touche + ", direction=" + direction + "]";
+				+ listeCoordonnees + ", coule=" + coule + ", direction=" + direction + ", touche=" + touche + "]";
 	}
 
 }

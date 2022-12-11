@@ -14,16 +14,15 @@ import config.ConfigurationJeu;
 public class Cuirasse extends Navire {
 
 	/**
-	 * @param id
-	 * @param taille
-	 * @param impactMissile
-	 * @param listeCoordonnees
-	 * @param coule
-	 * @param direction
+	 * @param id : (1 : CUIRASSE )
+	 * @param taille : (7 : CUIRASSE )
+	 * @param impactMissile : (9 : CUIRASSE )
+	 * @param listeCoordonnees : Liste des coordonnes des blocs du Navire
+	 * @param coule : (True : Si tous les blocs du Navire sont coulees | False : sinon)
+	 * @param direction : (0 : HORIZONTALE | 1 : VERTICALE)
 	 */
-	public Cuirasse(int id, int taille, int impactMissile, ArrayList<Coordonnees> coordonnees, boolean coule,
-			boolean touche , int direction ) {
-		super(id, taille, impactMissile, coordonnees, coule, touche, direction);
+	public Cuirasse( ArrayList<Coordonnees> listeCoordonnees, int direction) {
+		super(listeCoordonnees, direction);
 		this.id = ConfigurationJeu.ID_CUIRASSE;
 		this.taille = ConfigurationJeu.TAILLE_CUIRASSE;
 		this.impactMissile = ConfigurationJeu.IMPACT_CROISSEUR;
@@ -36,7 +35,19 @@ public class Cuirasse extends Navire {
 				+ listeCoordonnees + ", coule=" + coule + ", direction=" + direction + ", touche=" + touche + "]";
 	}
 
-
+//	public static void main (String [] args ) {
+//		
+//		ArrayList<Coordonnees> listeCoordonnees = new ArrayList<Coordonnees>();
+//		
+//		for(int i=0 ; i<ConfigurationJeu.TAILLE_CUIRASSE ; i++) {
+//			listeCoordonnees.add(OutilsJeu.generateurCoordonneesAleatoire());
+//		}
+//		
+//		Cuirasse cu = new Cuirasse(listeCoordonnees);
+//		
+//		System.out.println(cu.toString());
+//	}
+//
 
 //	public static void main(String[] args) {
 //

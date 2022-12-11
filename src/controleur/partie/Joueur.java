@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import config.ConfigurationJeu;
-import controleur.partie.JeuUtilite;
-import modele.map.Bloc;
-import modele.map.Carte;
+import outils.OutilsJeu;
+import modele.grille.Bloc;
+import modele.grille.Grille;
 import modele.mobile.Coordonnees;
 import modele.mobile.Croisseur;
 import modele.mobile.Cuirasse;
@@ -24,38 +24,39 @@ import modele.mobile.SousMarin;
 
 public class Joueur {
 
-	private Carte carteJoueur;
-	private Carte carteEnnemi;
+	private Grille grilleJoueur;
+	private Grille grilleEnnemi;
 
 	private ArrayList<Coordonnees> listeCoordonneesFlotte;
 
 	private Flotte flotte;
-	
+
 	private int NbBlocTouche;
 	private int NbNavireCoule;
 
-	public Joueur(Carte carteJoueur, Carte carteRobot) {
-		this.carteJoueur = carteJoueur;
-		this.carteEnnemi = carteRobot;
+	public Joueur(Grille carteJoueur, Grille carteEnnemi) {
+		this.grilleJoueur = carteJoueur;
+		this.grilleEnnemi = carteEnnemi;
 		this.listeCoordonneesFlotte = new ArrayList<Coordonnees>();
 
-		this.flotte = generationFlotteAleatoire(carteJoueur);
+		this.flotte = generationFlotte(carteJoueur);
 		placementFlotte();
-		
+
 		NbBlocTouche = 0;
 		NbNavireCoule = 0;
+
 	}
 
-	public Carte getCarteJoueur() {
-		return carteJoueur;
+	public Grille getGrilleJoueur() {
+		return grilleJoueur;
 	}
 
-	public Carte getCarteEnnemi() {
-		return carteEnnemi;
+	public Grille getGrilleEnnemi() {
+		return grilleEnnemi;
 	}
 
-	public void setCarteJoueur(Carte carteJoueur) {
-		this.carteJoueur = carteJoueur;
+	public void setGrilleJoueur(Grille carteJoueur) {
+		this.grilleJoueur = carteJoueur;
 	}
 
 	public Flotte getFlotte() {
@@ -97,7 +98,7 @@ public class Joueur {
 			throw new IllegalArgumentException("Unexpected value: " + id);
 		}
 
-		Bloc b = carteJoueur.getBloc(BlocLigne, BlocColonne);
+		Bloc b = grilleJoueur.getBloc(BlocLigne, BlocColonne);
 
 		b.setValeur(value);
 	}
@@ -185,7 +186,7 @@ public class Joueur {
 
 	}
 
-	public ArrayList<Coordonnees> coordonneesAleatoire(int taille, int direction) {
+	public ArrayList<Coordonnees> listeCoordonneesAleatoire(int taille, int direction) {
 		Random r = new Random();
 		int CordLigne = r.nextInt(15) + 1;
 		int CordColonne = r.nextInt(15) + 1;
@@ -211,182 +212,234 @@ public class Joueur {
 	public ArrayList<Coordonnees> generationCoordonnees(int taille, int direction) {
 		ArrayList<Coordonnees> listeCoordonnees = new ArrayList<Coordonnees>();
 
-		listeCoordonnees = coordonneesAleatoire(taille, direction);
+		listeCoordonnees = listeCoordonneesAleatoire(taille, direction);
 
 		return listeCoordonnees;
 	}
 
 	public Cuirasse generationCuirasse() {
-		int direction = JeuUtilite.directionAleatoire();
+		int direction = OutilsJeu.directionAleatoire();
 		System.out.println("\nLA DIRECTION DU CUIRASSE : " + direction);
-		ArrayList<Coordonnees> coordCuirasse = generationCoordonnees(ConfigurationJeu.TAILLE_CUIRASSE, direction);
+		ArrayList<Coordonnees> listeCoordCuirasse = generationCoordonnees(ConfigurationJeu.TAILLE_CUIRASSE, direction);
 
-		Cuirasse cuirasse = new Cuirasse(ConfigurationJeu.ID_CUIRASSE, ConfigurationJeu.TAILLE_CUIRASSE,
-				ConfigurationJeu.IMPACT_CUIRASSE, coordCuirasse, false, false, direction);
+		Cuirasse cuirasse = new Cuirasse(listeCoordCuirasse, direction);
 
 		return cuirasse;
 
 	}
 
 	public Croisseur generationCroisseur() {
-		int direction = JeuUtilite.directionAleatoire();
+		int direction = OutilsJeu.directionAleatoire();
 		System.out.println("\nLA DIRECTION DU CROISSEUR : " + direction);
-		ArrayList<Coordonnees> coordCroisseur = generationCoordonnees(ConfigurationJeu.TAILLE_CROISSEUR, direction);
+		ArrayList<Coordonnees> listeCoordCroisseur = generationCoordonnees(ConfigurationJeu.TAILLE_CROISSEUR,
+				direction);
 
-		Croisseur croisseur = new Croisseur(ConfigurationJeu.ID_CROISSEUR, ConfigurationJeu.TAILLE_CROISSEUR,
-				ConfigurationJeu.IMPACT_CROISSEUR, coordCroisseur, false, false, direction);
+		Croisseur croisseur = new Croisseur(listeCoordCroisseur, direction);
 
 		return croisseur;
 
 	}
 
 	public Destroyer generationDestroyer() {
-		int direction = JeuUtilite.directionAleatoire();
+		int direction = OutilsJeu.directionAleatoire();
 		System.out.println("\nLA DIRECTION DU DESTROYER : " + direction);
-		ArrayList<Coordonnees> coordDestroyer = generationCoordonnees(ConfigurationJeu.TAILLE_DESTROYER, direction);
+		ArrayList<Coordonnees> listeCoordDestroyer = generationCoordonnees(ConfigurationJeu.TAILLE_DESTROYER,
+				direction);
 
-		Destroyer destroyer = new Destroyer(ConfigurationJeu.ID_DESTROYER, ConfigurationJeu.TAILLE_DESTROYER,
-				ConfigurationJeu.IMPACT_DESTROYER, coordDestroyer, false, direction, true);
+		Destroyer destroyer = new Destroyer(listeCoordDestroyer, direction);
 
 		return destroyer;
 	}
 
 	public SousMarin generationSousMarin() {
-		int direction = JeuUtilite.directionAleatoire();
+		int direction = OutilsJeu.directionAleatoire();
 		System.out.println("\nLA DIRECTION DU SOUS-MARIN : " + direction);
-		ArrayList<Coordonnees> coordSousMarin = generationCoordonnees(ConfigurationJeu.TAILLE_SOUSMARIN, direction);
+		ArrayList<Coordonnees> listeCoordSousMarin = generationCoordonnees(ConfigurationJeu.TAILLE_SOUSMARIN,
+				direction);
 
-		SousMarin sousMarin = new SousMarin(ConfigurationJeu.ID_SOUSMARIN, ConfigurationJeu.TAILLE_SOUSMARIN,
-				ConfigurationJeu.IMPACT_SOUSMARIN, coordSousMarin, false, false, direction);
+		SousMarin sousMarin = new SousMarin(listeCoordSousMarin, direction);
 
 		return sousMarin;
 	}
 
-	public Flotte generationFlotteAleatoire(Carte carteJoueur) {
+	public Flotte generationFlotte(Grille carteJoueur) {
 		ArrayList<Navire> listeNavire = new ArrayList<Navire>();
 
-		Cuirasse cuirasse = generationCuirasse();
-		listeNavire.add(cuirasse);
+		listeNavire.add(generationCuirasse());
 
 		for (int i = 1; i <= 2; i++) {
-			Croisseur croisseur = generationCroisseur();
-			listeNavire.add(croisseur);
+			listeNavire.add(generationCroisseur());
 		}
 
 		for (int i = 1; i <= 3; i++) {
-			Destroyer destroyer = generationDestroyer();
-			listeNavire.add(destroyer);
+			listeNavire.add(generationDestroyer());
 		}
 
 		for (int i = 1; i <= 4; i++) {
-			SousMarin sousMarin = generationSousMarin();
-			listeNavire.add(sousMarin);
+			listeNavire.add(generationSousMarin());
 		}
 		Flotte f = new Flotte(listeNavire);
 		System.out.println("LA FLOTTE : " + f.toString());
 
-		return new Flotte(listeNavire);
+		return f;
 	}
 
 	public void stockBlocTouche(Coordonnees coordonnees, int impact, int id) {
 		int coordX = coordonnees.getLigne();
 		int coordY = coordonnees.getColonne();
-		
-		Carte carte = carteEnnemi;
+
+		Grille carteEnemi = grilleEnnemi;
 
 		Bloc b = null;
 		if (impact == 9) {
-			System.out.println("IMPACT DE : " + impact + " CASES !!!");
-			b = carte.getBloc(coordX, coordY);
-			b.setTouche(true);
 
-			b = carte.getBloc(coordX - 1, coordY - 1);
-			b.setTouche(true);
+			System.out.println("\nTIRE DE CUIRASSE EN " + coordonnees.toString() + "\n");
 
-			b = carte.getBloc(coordX + 1, coordY + 1);
+			System.out.println("\nIMPACT DE : " + impact + " CASES !!!\n");
+			b = carteEnemi.getBloc(coordX, coordY);
 			b.setTouche(true);
+			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
+				b.setValeur("//");
+			}
 
-			b = carte.getBloc(coordX + 1, coordY);
+			b = carteEnemi.getBloc(coordX - 1, coordY - 1);
 			b.setTouche(true);
+			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
+				b.setValeur("//");
+			}
 
-			b = carte.getBloc(coordX, coordY + 1);
+			b = carteEnemi.getBloc(coordX + 1, coordY + 1);
 			b.setTouche(true);
+			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
+				b.setValeur("//");
+			}
 
-			b = carte.getBloc(coordX - 1, coordY);
+			b = carteEnemi.getBloc(coordX + 1, coordY);
 			b.setTouche(true);
+			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
+				b.setValeur("//");
+			}
 
-			b = carte.getBloc(coordX, coordY - 1);
+			b = carteEnemi.getBloc(coordX, coordY + 1);
 			b.setTouche(true);
+			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
+				b.setValeur("//");
+			}
 
-			b = carte.getBloc(coordX + 1, coordY - 1);
+			b = carteEnemi.getBloc(coordX - 1, coordY);
 			b.setTouche(true);
+			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
+				b.setValeur("//");
+			}
 
-			b = carte.getBloc(coordX - 1, coordY + 1);
+			b = carteEnemi.getBloc(coordX, coordY - 1);
 			b.setTouche(true);
+			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
+				b.setValeur("//");
+			}
+
+			b = carteEnemi.getBloc(coordX + 1, coordY - 1);
+			b.setTouche(true);
+			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
+				b.setValeur("//");
+			}
+
+			b = carteEnemi.getBloc(coordX - 1, coordY + 1);
+			b.setTouche(true);
+			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
+				b.setValeur("//");
+			}
 
 		} else if (impact == 4) {
-			System.out.println("IMPACT DE : " + impact + " CASES !!!");
-			b = carte.getBloc(coordX, coordY);
+
+			System.out.println("\nTIRE DE CROISSEUR EN " + coordonnees.toString() + "\n");
+
+			System.out.println("\nIMPACT DE : " + impact + " CASES !!!\n");
+			b = carteEnemi.getBloc(coordX, coordY);
 			b.setTouche(true);
-
-			b = carte.getBloc(coordX - 1, coordY);
-			b.setTouche(true);
-
-			b = carte.getBloc(coordX + 1, coordY);
-			b.setTouche(true);
-
-			b = carte.getBloc(coordX, coordY - 1);
-			b.setTouche(true);
-
-			b = carte.getBloc(coordX, coordY + 1);
-			b.setTouche(true);
-		} else if (id == 3 && ConfigurationJeu.NB_FUSEE_ECLAIRANTE > 0) {
-			b = carte.getBloc(coordX, coordY);
-			b.setEclaire(true);
-
-			b = carte.getBloc(coordX - 1, coordY);
-			b.setEclaire(true);
-
-			b = carte.getBloc(coordX + 1, coordY);
-			b.setEclaire(true);
-
-			b = carte.getBloc(coordX, coordY - 1);
-			b.setEclaire(true);
-
-			b = carte.getBloc(coordX, coordY + 1);
-			b.setEclaire(true);
-			ConfigurationJeu.NB_FUSEE_ECLAIRANTE--;
-		} else {
-			System.out.println("IMPACT DE : " + impact + " CASES !!!");
-			b = carte.getBloc(coordX, coordY);
-			b.setTouche(true);
-
-		}
-
-	}
-
-	private Coordonnees decodeCoordonnees(String[] stringCoordonnes) {
-		String indiceLigneString = stringCoordonnes[0];
-		String indiceColonneString = stringCoordonnes[1];
-		int indiceColonne = Integer.parseInt(indiceColonneString);
-
-		Coordonnees c = null;
-
-		int i = 0;
-
-		for (String string : ConfigurationJeu.INDICE_LIGNE.split(",")) {
-			if (indiceLigneString.equals(string)) {
-				c = new Coordonnees(i, indiceColonne);
+			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
+				b.setValeur("//");
 			}
-			i++;
-		}
 
-		return c;
+			b = carteEnemi.getBloc(coordX - 1, coordY);
+			b.setTouche(true);
+			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
+				b.setValeur("//");
+			}
+
+			b = carteEnemi.getBloc(coordX + 1, coordY);
+			b.setTouche(true);
+			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
+				b.setValeur("//");
+			}
+
+			b = carteEnemi.getBloc(coordX, coordY - 1);
+			b.setTouche(true);
+			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
+				b.setValeur("//");
+			}
+
+			b = carteEnemi.getBloc(coordX, coordY + 1);
+			b.setTouche(true);
+			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
+				b.setValeur("//");
+			}
+		} else if (id == 3 && ConfigurationJeu.NB_FUSEE_ECLAIRANTE > 0) {
+
+			System.out.println("\nTIRE DE FUSEE ECLAIRANTE EN " + coordonnees.toString() + "\n");
+
+			b = carteEnemi.getBloc(coordX, coordY);
+			if (!b.isTouche()) {
+				b.setEclaire(true);
+			}
+
+			b = carteEnemi.getBloc(coordX - 1, coordY);
+			if (!b.isTouche()) {
+				b.setEclaire(true);
+			}
+
+			b = carteEnemi.getBloc(coordX + 1, coordY);
+			if (!b.isTouche()) {
+				b.setEclaire(true);
+			}
+
+			b = carteEnemi.getBloc(coordX, coordY - 1);
+			if (!b.isTouche()) {
+				b.setEclaire(true);
+			}
+
+			b = carteEnemi.getBloc(coordX, coordY + 1);
+			if (!b.isTouche()) {
+				b.setEclaire(true);
+			}
+			ConfigurationJeu.NB_FUSEE_ECLAIRANTE--;
+		} else if (id == 3) {
+			System.out.println("\nTIRE DE DESTROYEUR EN " + coordonnees.toString() + "\n");
+
+			System.out.println("\nIMPACT DE : " + impact + " CASES !!!\n");
+
+			b = carteEnemi.getBloc(coordX, coordY);
+			b.setTouche(true);
+			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
+				b.setValeur("//");
+			}
+
+		} else {
+			System.out.println("\nTIRE DE SOUS-MARIN EN " + coordonnees.toString() + "\n");
+			System.out.println("\nIMPACT DE : " + impact + " CASES !!!\n");
+
+			b = carteEnemi.getBloc(coordX, coordY);
+			b.setTouche(true);
+			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
+				b.setValeur("//");
+			}
+
+		}
 
 	}
 
 	public void updateNavireTouche(Coordonnees coordonnees) {
-		Bloc[][] blocs = carteJoueur.getBlocs();
+		Bloc[][] blocs = grilleJoueur.getBlocs();
 
 		ArrayList<Navire> listeNav = flotte.getListeNavire();
 
@@ -411,9 +464,9 @@ public class Joueur {
 		}
 	}
 
-	public void tirer(String[] stringCoordonnes, int id) {
+	public void tirer(Coordonnees coordonnees, int id) {
 
-		Coordonnees coordonnees = decodeCoordonnees(stringCoordonnes);
+		System.out.println(coordonnees);
 
 		if (id == 1) {
 			stockBlocTouche(coordonnees, ConfigurationJeu.IMPACT_CUIRASSE, id);
@@ -443,7 +496,7 @@ public class Joueur {
 			BlocLigne = c.getLigne();
 			BlocColonne = c.getColonne();
 
-			Bloc b = carteJoueur.getBloc(BlocLigne, BlocColonne);
+			Bloc b = grilleJoueur.getBloc(BlocLigne, BlocColonne);
 			b.setValeur(value);
 		}
 	}
@@ -526,7 +579,7 @@ public class Joueur {
 			throw new IllegalArgumentException("Unexpected value: " + directionDeplacement);
 		}
 
-		Bloc FutureBlocNavire = carteJoueur.getBloc(futureCoordLigne, futureCoordColonne);
+		Bloc FutureBlocNavire = grilleJoueur.getBloc(futureCoordLigne, futureCoordColonne);
 
 		if (FutureBlocNavire.getValeur().equals("  ")) {
 			return true;
@@ -594,20 +647,41 @@ public class Joueur {
 		return 44;
 	}
 
+//	public void afficheFlotteNumerote() {
+//		Bloc[][] blocs = getGrilleJoueur().getBlocs();
+//
+//		for (int i = 0; i < ConfigurationJeu.NB_LIGNE - 1; i++) {
+//			for (int j = 0; j < ConfigurationJeu.NB_COLONNE - 1; j++) {
+//				if (i < 1 || j < 1) {
+//					System.out.print("[" + blocs[i][j].getValeur() + "]");
+//				} else if (!blocs[i][j].getValeur().equals("  ") && !blocs[i][j].isTouche()) {
+//					System.out.print("[0" + recupIndice(i, j) + "]");
+//				} else if (blocs[i][j].isTouche()) {
+//					System.out.print("[//]");
+//				} else if (blocs[i][j].isCoule()) {
+//					System.out.print("[::]");
+//				} else {
+//					System.out.print("[--]");
+//				}
+//			}
+//			System.out.println();
+//		}
+//	}
+
 	public void afficheFlotteNumerote() {
-		Bloc[][] blocs = getCarteJoueur().getBlocs();
+		
+		System.out.println("\nAFFICHAGE GRILLE NUMEROTE : \n");
+		
+		Bloc[][] blocs = getGrilleJoueur().getBlocs();
 
 		for (int i = 0; i < ConfigurationJeu.NB_LIGNE - 1; i++) {
 			for (int j = 0; j < ConfigurationJeu.NB_COLONNE - 1; j++) {
-				if (i < 1 || j < 1) {
+				if ((i < 1 || j < 1) || blocs[i][j].getValeur().equals("//") || blocs[i][j].getValeur().equals("::")) {
 					System.out.print("[" + blocs[i][j].getValeur() + "]");
-				} else if (!blocs[i][j].getValeur().equals("  ") && !blocs[i][j].isTouche()) {
+				} else if (!blocs[i][j].getValeur().equals("  ") && !blocs[i][j].getValeur().equals("//")
+						&& !blocs[i][j].getValeur().equals("::")) {
 					System.out.print("[0" + recupIndice(i, j) + "]");
-				} else if (blocs[i][j].isTouche()) {
-					System.out.print("[//]");
-				} else if (blocs[i][j].isCoule()) {
-					System.out.print("[::]");
-				}else {
+				} else {
 					System.out.print("[--]");
 				}
 			}
@@ -632,7 +706,7 @@ public class Joueur {
 	}
 
 	public void incrementeNombreBlocTouche() {
-		Bloc[][] blocs = carteEnnemi.getBlocs();
+		Bloc[][] blocs = grilleEnnemi.getBlocs();
 
 		for (int i = 1; i < ConfigurationJeu.NB_LIGNE; i++) {
 			for (int j = 1; j < ConfigurationJeu.NB_COLONNE; j++) {
@@ -646,7 +720,7 @@ public class Joueur {
 	public void verifNavireCoule() {
 		ArrayList<Navire> listeNav = flotte.getListeNavire();
 
-		Bloc[][] blocs = carteJoueur.getBlocs();
+		Bloc[][] blocs = grilleJoueur.getBlocs();
 
 		for (int i = 0; i < listeNav.size(); i++) {
 			ArrayList<Coordonnees> listeCoord = listeNav.get(i).getListeCoordonnees();
@@ -680,7 +754,7 @@ public class Joueur {
 			BlocLigne = c.getLigne();
 			BlocColonne = c.getColonne();
 
-			Bloc b = carteJoueur.getBloc(BlocLigne, BlocColonne);
+			Bloc b = grilleJoueur.getBloc(BlocLigne, BlocColonne);
 			b.setCoule(true);
 			b.setValeur(value);
 		}
@@ -695,7 +769,7 @@ public class Joueur {
 			BlocLigne = c.getLigne();
 			BlocColonne = c.getColonne();
 
-			Bloc b = carteJoueur.getBloc(BlocLigne, BlocColonne);
+			Bloc b = grilleJoueur.getBloc(BlocLigne, BlocColonne);
 			b.setCoule(true);
 			b.setValeur(value);
 		}
@@ -708,14 +782,8 @@ public class Joueur {
 		return false;
 	}
 
-	@Override
-	public String toString() {
-		return "Joueur [carteJoueur=" + carteJoueur + ", carteEnnemi=" + carteEnnemi + ", flotte=" + flotte + "]";
-	}
-
 	public String coupAleatoire() {
-		int valeurAleatoire = JeuUtilite.valeurAleatoire(2);
-		System.out.println(valeurAleatoire);
+		int valeurAleatoire = OutilsJeu.valeurAleatoire(2);
 		if (valeurAleatoire == 1) {
 			return "t";
 		} else {
@@ -723,42 +791,12 @@ public class Joueur {
 		}
 	}
 
-	public String[] coordAleatoireSplit() {
-		int indiceLigneAleatoire = JeuUtilite.valeurAleatoire(ConfigurationJeu.NB_LIGNE - 2);
-		int indiceColonneAleatoire = JeuUtilite.valeurAleatoire(ConfigurationJeu.NB_COLONNE - 2);
-
-		String indiceLigne = ConfigurationJeu.INDICE_LIGNE;
-		String[] tabIndiceLigne = indiceLigne.split(",");
-
-		String indiceColonne = ConfigurationJeu.INDICE_COLONNE;
-		String[] tabIndiceColonne = indiceColonne.split(",");
-
-		String[] coordonneesSplit = { tabIndiceLigne[indiceLigneAleatoire], tabIndiceColonne[indiceColonneAleatoire] };
-		return coordonneesSplit;
-	}
-
-	public int idNavireAleatoire() {
-		return JeuUtilite.valeurAleatoire(9);
-	}
-
-	public String recupNomBateau(int id) {
-		if (id == 1) {
-			return ConfigurationJeu.NOM_CUIRASSE;
-		} else if (id == 2) {
-			return ConfigurationJeu.NOM_CROISSEUR;
-		} else if (id == 3) {
-			return ConfigurationJeu.NOM_DESTROYER;
-		} else {
-			return ConfigurationJeu.NOM_SOUSMARIN;
-		}
-	}
-
 	public int idNavireDeplacement() {
-		return JeuUtilite.valeurZeroAleatoire(10);
+		return OutilsJeu.valeurZeroAleatoire(10);
 	}
 
 	public int directionAleatoire() {
-		int direction = JeuUtilite.valeurZeroAleatoire(4);
+		int direction = OutilsJeu.valeurZeroAleatoire(4);
 		System.out.println("DIRECTION ALEATOIRE TIREE : " + direction);
 		return direction;
 	}
@@ -814,7 +852,8 @@ public class Joueur {
 	}
 
 	public boolean verifDeplacable(int indiceNavire) {
-		if ((verifTouche(indiceNavire) && verifCoule(indiceNavire)) || (verifCoule(indiceNavire) || verifTouche(indiceNavire) )) {
+		if ((verifTouche(indiceNavire) && verifCoule(indiceNavire))
+				|| (verifCoule(indiceNavire) || verifTouche(indiceNavire))) {
 			return false;
 		} else {
 			return true;
@@ -823,45 +862,62 @@ public class Joueur {
 
 	public boolean verifNavireDispo(int idNavire) {
 		ArrayList<Navire> listeNav = flotte.getListeNavire();
-		
-		int verif =0;
-		
+
+		int verif = 0;
+
 		for (Navire navire : listeNav) {
-			if(navire.getId() == idNavire) {
-				if(!navire.isCoule()) {
-					verif ++;
+			if (navire.getId() == idNavire) {
+				if (!navire.isCoule()) {
+					verif++;
 				}
 			}
 		}
-		if(verif>0) {
+		if (verif > 0) {
 			return true;
-		}else {
+		} else {
 			return false;
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "Joueur [grilleJoueur=" + grilleJoueur + ", grilleEnnemi=" + grilleEnnemi + ", flotte=" + flotte + "]";
+	}
+
+	public boolean NbNavireDeplacable() {
+		ArrayList<Navire> listeNavires = flotte.getListeNavire();
+		int verif =0;
+		for (Navire navire : listeNavires) {
+			if(! navire.isTouche()) {
+				verif++;
+			}
+		}
+		return verif>0;
+	}
+
 //	public static void main(String[] args) {
-//		Carte carteJoueur = new Carte(ConfigurationJeu.NB_LIGNE, ConfigurationJeu.NB_COLONNE);
-//		Carte carteRobot = new Carte(ConfigurationJeu.NB_LIGNE, ConfigurationJeu.NB_COLONNE);
+//		AffichageCLI afficheCLI = new AffichageCLI();
+//		
+//		Grille grilleJoueur = new Grille(ConfigurationJeu.NB_LIGNE, ConfigurationJeu.NB_COLONNE);
+//		Grille grilleRobot = new Grille(ConfigurationJeu.NB_LIGNE, ConfigurationJeu.NB_COLONNE);
 //
-//		Joueur j = new Joueur(carteJoueur, carteRobot);
-//
-//		System.out.println("\n-------------------------------------------------\n");
-//
-//		j.carteJoueur.afficheCarte();
-//
-//		System.out.println("\n-------------------------------------------------\n");
-//
-//		j.carteJoueur.afficheCarteEnnemi(true);
+//		Joueur j = new Joueur(grilleJoueur, grilleRobot);
+//		Joueur robot = new Joueur(grilleRobot, grilleJoueur);
 //
 //		System.out.println("\n-------------------------------------------------\n");
 //
-//		ArrayList<Navire> copyFlotte = j.getFlotte().getListeNavire();
+//		afficheCLI.afficheGrille(j.getGrilleJoueur());
 //
-//		String[] coordonnees = { "f", "05" };
-//		j.tirer(coordonnees, 3);
+//		System.out.println("\n-------------------------------------------------\n");
 //
-//		j.carteJoueur.afficheCarteEnnemi(false);
+//		afficheCLI.afficheGrilleEnnemi(j.getGrilleEnnemi(), false);
+//
+//		System.out.println("\n-------------------------------------------------\n");
+//
+//		j.tirer(OutilsJeu.traduitCoordonnees("a 02"), 3);
+//
+//		afficheCLI.afficheGrilleEnnemi(j.getGrilleEnnemi(), false);
+//		
 //
 //		// TEST DEPLACEMENT
 //
@@ -869,12 +925,12 @@ public class Joueur {
 ////		
 ////		j.deplacer(1, 3);
 ////		
-////		j.carteJoueur.afficheCarte();
+////		j.carteJoueur.afficheGrille();
 //
 ////
 ////		System.out.println("\n-------------------------------------------------\n");
 ////
-////		j.carteJoueur.afficheCarte();
+////		j.carteJoueur.afficheGrille();
 //
 //	}
 

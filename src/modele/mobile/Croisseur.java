@@ -14,16 +14,15 @@ import config.ConfigurationJeu;
 public class Croisseur extends Navire {
 
 	/**
-	 * @param id
-	 * @param taille
-	 * @param impactMissile
-	 * @param listeCoordonnees
-	 * @param coule
-	 * @param direction
+	 * @param id : ( 2: CROISEUR )
+	 * @param taille : ( 5: CROISEUR )
+	 * @param impactMissile : ( 4: CROISEUR )
+	 * @param listeCoordonnees : Liste des coordonnes des blocs du Navire
+	 * @param coule : (True : Si tous les blocs du Navire sont coulees | False : sinon)
+	 * @param direction : (0 : HORIZONTALE | 1 : VERTICALE)
 	 */
-	public Croisseur(int id, int taille, int impactMissile, ArrayList<Coordonnees> coordonnees, boolean coule,
-			boolean touche, int direction) {
-		super(id, taille, impactMissile, coordonnees, coule, touche, direction);
+	public Croisseur(ArrayList<Coordonnees> listeCoordonnees, int direction) {
+		super(listeCoordonnees, direction);
 		this.id = ConfigurationJeu.ID_CROISSEUR;
 		this.taille = ConfigurationJeu.TAILLE_CROISSEUR;
 		this.impactMissile = ConfigurationJeu.IMPACT_CROISSEUR;

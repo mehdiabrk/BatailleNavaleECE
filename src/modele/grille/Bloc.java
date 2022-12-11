@@ -5,7 +5,7 @@
  *
  * 26 nov. 2022
  */
-package modele.map;
+package modele.grille;
 
 public class Bloc {
 	private String valeur;
@@ -15,14 +15,21 @@ public class Bloc {
 	private boolean coule;
 	private boolean eclaire;
 
-	public Bloc(String valeur, int ligne, int colonne, boolean touche, boolean coule, boolean eclaire) {
+	/**
+	 * @param valeur  : Chaque bloc possede une valeur qui lui est propre et qui est
+	 *                utilisé lors de son affichage
+	 * @param ligne   : Un bloc est identifiable par deux indices, la ligne est le premier
+	 * @param colonne : Un bloc est identifiable par deux indices, la colonne est le second
+	 */
+	public Bloc(String valeur, int ligne, int colonne) {
 		this.valeur = valeur;
 		this.ligne = ligne;
 		this.colonne = ligne;
-		this.touche = touche;
-		this.coule = coule;
-		this.eclaire = eclaire;
+		this.touche = false;
+		this.coule = false;
+		this.eclaire = false;
 	}
+
 
 	public String getValeur() {
 		return valeur;

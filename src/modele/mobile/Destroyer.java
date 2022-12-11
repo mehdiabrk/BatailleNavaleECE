@@ -12,18 +12,17 @@ import java.util.ArrayList;
 import config.ConfigurationJeu;
 
 public class Destroyer extends Navire {
-
+	
 	/**
-	 * @param id
-	 * @param taille
-	 * @param impactMissile
-	 * @param listeCoordonnees
-	 * @param coule
-	 * @param direction
+	 * @param id : ( 3: DESTROYER )
+	 * @param taille : ( 3: DESTROYER )
+	 * @param impactMissile : ( 1: DESTROYER )
+	 * @param listeCoordonnees : Liste des coordonnes des blocs du Navire
+	 * @param coule : (True : Si tous les blocs du Navire sont coulees | False : sinon)
+	 * @param direction : (0 : HORIZONTALE | 1 : VERTICALE)
 	 */
-	public Destroyer(int id, int taille, int impactMissile, ArrayList<Coordonnees> coordonnees, boolean coule,
-			int direction, boolean touche) {
-		super(id, taille, impactMissile, coordonnees, coule, touche, direction);
+	public Destroyer(ArrayList<Coordonnees> listeCoordonnees, int direction) {
+		super(listeCoordonnees, direction);
 		this.id = ConfigurationJeu.ID_DESTROYER;
 		this.taille = ConfigurationJeu.TAILLE_DESTROYER;
 		this.impactMissile = ConfigurationJeu.IMPACT_DESTROYER;

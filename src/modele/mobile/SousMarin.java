@@ -14,16 +14,15 @@ import config.ConfigurationJeu;
 public class SousMarin extends Navire {
 
 	/**
-	 * @param id
-	 * @param taille
-	 * @param impactMissile
-	 * @param listeCoordonnees
-	 * @param coule
-	 * @param direction
+	 * @param id : ( 4: SOUS-MARIN )
+	 * @param taille : ( 1: SOUS-MARIN )
+	 * @param impactMissile : ( 1: SOUS-MARIN )
+	 * @param listeCoordonnees : Liste des coordonnes des blocs du Navire
+	 * @param coule : (True : Si tous les blocs du Navire sont coulees | False : sinon)
+	 * @param direction : (0 : HORIZONTALE | 1 : VERTICALE)
 	 */
-	public SousMarin(int id, int taille, int impactMissile, ArrayList<Coordonnees> coordonnees, boolean coule,
-			boolean touche, int direction) {
-		super(id, taille, impactMissile, coordonnees, coule, touche, direction);
+	public SousMarin(ArrayList<Coordonnees> listeCoordonnees, int direction) {
+		super(listeCoordonnees, direction);
 		this.id = ConfigurationJeu.ID_SOUSMARIN;
 		this.taille = ConfigurationJeu.TAILLE_SOUSMARIN;
 		this.impactMissile = ConfigurationJeu.IMPACT_SOUSMARIN;
@@ -34,5 +33,18 @@ public class SousMarin extends Navire {
 		return "SousMarin [id=" + id + ", taille=" + taille + ", impactMissile=" + impactMissile + ", listeCoordonnees="
 				+ listeCoordonnees + ", coule=" + coule + ", direction=" + direction + ", touche=" + touche + "]";
 	}
+	
+//	public static void main (String [] args ) {
+//		
+//		ArrayList<Coordonnees> listeCoordonnees = new ArrayList<Coordonnees>();
+//		
+//		for(int i=0 ; i<ConfigurationJeu.TAILLE_SOUSMARIN ; i++) {
+//			listeCoordonnees.add(OutilsJeu.generateurCoordonneesAleatoire());
+//		}
+//		
+//		SousMarin sm = new SousMarin(listeCoordonnees);
+//		
+//		System.out.println(sm.toString());
+//	}
 
 }

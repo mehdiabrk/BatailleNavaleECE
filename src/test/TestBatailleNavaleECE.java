@@ -8,11 +8,12 @@
 package test;
 
 import config.ConfigurationJeu;
+import controleur.jeu.Controleur;
 
 public class TestBatailleNavaleECE {
 
 	public static void main(String[] args) {
-		System.out.println("BATAILLE NAVALE ECE");
+		new  Controleur();
 	}
 
 }

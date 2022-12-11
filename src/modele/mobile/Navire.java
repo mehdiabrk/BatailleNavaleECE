@@ -19,22 +19,18 @@ public class Navire {
 	protected boolean touche;
 
 	/**
-	 * @param id
-	 * @param taille
-	 * @param impactMissile
-	 * @param listeCoordonnees
-	 * @param coule
-	 * @param direction
+	 * @param id : (1 : CUIRASSE | 2: CROISEUR | 3: DESTROYER | 4: SOUS-MARIN)
+	 * @param taille : (7 : CUIRASSE | 5: CROISEUR | 3: DESTROYER | 1: SOUS-MARIN)
+	 * @param impactMissile : (9 : CUIRASSE | 4: CROISEUR | 1: DESTROYER | 1: SOUS-MARIN)
+	 * @param listeCoordonnees : Liste des coordonnes des blocs du Navire
+	 * @param coule : (True : Si tous les blocs du Navire sont coulees | False : sinon)
+	 * @param direction : (0 : HORIZONTALE | 1 : VERTICALE)
 	 */
-	public Navire(int id, int taille, int impactMissile, ArrayList<Coordonnees> coordonnees, boolean coule,
-			boolean touche, int direction ) {
-		this.id = id;
-		this.taille = taille;
-		this.impactMissile = impactMissile;
-		this.listeCoordonnees = coordonnees;
-		this.coule = coule;
+	public Navire(ArrayList<Coordonnees> listeCoordonnees, int direction) {
+		this.listeCoordonnees = listeCoordonnees;
+		this.coule = false;
 		this.direction = direction;
-		this.touche = touche;
+		this.touche = false;
 	}
 
 	public int getId() {

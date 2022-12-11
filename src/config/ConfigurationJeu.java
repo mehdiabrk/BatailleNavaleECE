@@ -48,5 +48,7 @@ public class ConfigurationJeu {
 	public static final int ID_SOUSMARIN = 4;
 	public static final int TAILLE_SOUSMARIN = 1;
 	public static final int IMPACT_SOUSMARIN = 1;
+	
+	public static boolean WIN = false;
 
 }

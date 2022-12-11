@@ -10,19 +10,26 @@ package controleur.partie;
 import java.util.Scanner;
 
 import config.ConfigurationJeu;
+import controleur.outils.OutilsJeu;
 import modele.grille.Grille;
 import modele.mobile.Coordonnees;
-import outils.OutilsJeu;
 import vu.cli.AffichageCLI;
+
+/**
+ * Cette classe sert a la creation d'un objet Partie. Une Partie est compose de
+ * deux joueurs. Nous l'avons nomme controleur car elle contient egalement les
+ * methodes servant a chaque partie ( exemple : tourJoueur() , tourRobot() ,
+ * ...)
+ */
 
 public class Partie {
 
 	private int nombreLigneGrille = ConfigurationJeu.NB_LIGNE;
 	private int nombreColonneGrille = ConfigurationJeu.NB_COLONNE;
 
-	private Grille grilleJoueur = new Grille(nombreLigneGrille, nombreColonneGrille);
+	private Grille grilleJoueur;
 
-	private Grille grilleRobot = new Grille(nombreLigneGrille, nombreColonneGrille);
+	private Grille grilleRobot;
 
 	private Joueur joueur;
 	private Joueur robot;
@@ -31,12 +38,19 @@ public class Partie {
 	private AffichageCLI affichageCLI = new AffichageCLI();
 
 	/**
-	 * @param in
-	 * @param joueur
-	 * @param robot
-	 * @param modeTriche
+	 * Premier Constructeur de la classe Partie : Servant lors d'une nouvelle partie
+	 * 
+	 * @param in         : Scanner servant a lire la console et a interagir avec
+	 *                   l'utilisateur
+	 * @param joueur     : Premier joueur de la partie
+	 * @param robot      : Seconde joueur de la partie
+	 * @param modeTriche : Vrai si en mode triche | Faux sinon
 	 */
 	public Partie(Scanner in) {
+
+		this.grilleJoueur = new Grille(nombreLigneGrille, nombreColonneGrille);
+		this.grilleRobot = new Grille(nombreLigneGrille, nombreColonneGrille);
+
 		this.joueur = new Joueur(grilleJoueur, grilleRobot);
 		this.robot = new Joueur(grilleRobot, grilleJoueur);
 
@@ -47,7 +61,7 @@ public class Partie {
 //		String scanValue = "o";
 		while (!(scanValue.equals("o") || scanValue.equals("n"))) {
 			System.out
-					.println("\nVous n\'avez pas rentré \"n\" ou \"o\" , veuillez respecter la consigne demandé !!!!");
+					.println("\nVous n\'avez pas rentre \"n\" ou \"o\" , veuillez respecter la consigne demande !!!!");
 			System.out.println("\nVoulez-vous lancer le jeu en mode triche ? ( OUI => o et NON => n )");
 			scanValue = in.nextLine(); // Lecture de la console
 		}
@@ -58,7 +72,43 @@ public class Partie {
 			this.modeTriche = false;
 		}
 
-		System.out.println("\n\t Votre partie à été créé avec succes !! ");
+		System.out.println("\n\t Votre partie a ete cree avec succes !! ");
+
+	}
+
+	/**
+	 * Second Constructeur de la classe Partie : Servant lors d'une nouvelle partie
+	 * 
+	 * @param in         : Scanner servant a lire la console et a interagir avec
+	 *                   l'utilisateur
+	 * @param joueur     : Premier joueur de la partie
+	 * @param robot      : Seconde joueur de la partie
+	 * @param modeTriche : Vrai si en mode triche | Faux sinon
+	 */
+	public Partie(Joueur joueur, Joueur robot, Scanner in) {
+
+		this.joueur = joueur;
+		this.robot = robot;
+
+		System.out.println("\nBienvenue dans le jeu Bataille Navale en mode console !!! \n");
+		System.out.println("\nVoulez-vous lancer le jeu en mode triche ? ( OUI => o et NON => n )");
+		// dimensions
+		String scanValue = in.nextLine(); // Lecture de la console
+//		String scanValue = "o";
+		while (!(scanValue.equals("o") || scanValue.equals("n"))) {
+			System.out
+					.println("\nVous n\'avez pas rentre \"n\" ou \"o\" , veuillez respecter la consigne demande !!!!");
+			System.out.println("\nVoulez-vous lancer le jeu en mode triche ? ( OUI => o et NON => n )");
+			scanValue = in.nextLine(); // Lecture de la console
+		}
+
+		if (scanValue.equals("o")) {
+			this.modeTriche = true;
+		} else {
+			this.modeTriche = false;
+		}
+
+		System.out.println("\n\t Votre partie a ete cree avec succes !! ");
 
 	}
 
@@ -74,6 +124,10 @@ public class Partie {
 		return modeTriche;
 	}
 
+	/**
+	 * Methode lancant le script du tour du Joueur
+	 * 
+	 */
 	public void tourJoueur(Scanner in) {
 		System.out.println("\n-------------------------------------------------\n");
 
@@ -91,33 +145,46 @@ public class Partie {
 
 		System.out.println("\n-------------------------------------------------\n");
 
-		System.out.println("\nVoulez-vous tirer ou deplacer un de vos navires ? ( TIRER => t et DEPLACER => d ) ");
+		System.out.println(
+				"\nVoulez-vous tirer ou deplacer un de vos navires ? ( TIRER => t || DEPLACER => d || QUITTER => q ) ");
 		String scanValue = in.nextLine(); // Lecture de la console
 
-		while (!(scanValue.equals("t") || scanValue.equals("d"))) {
+		while (!(scanValue.equals("t") || scanValue.equals("d") || scanValue.equals("q"))) {
 			System.out.println(
-					"\nVous n\'avez pas rentré la valeur attendu, veuillez respecter la consigne demandé !!!!");
-			System.out.println("\nVoulez-vous tirer ou deplacer un de vos navires ? ( TIRER => t et DEPLACER => d ) ");
+					"\nVous n\'avez pas rentre la valeur attendu, veuillez respecter la consigne demande !!!!");
+			System.out.println(
+					"\nVoulez-vous tirer ou deplacer un de vos navires ? ( TIRER => t || DEPLACER => d || QUITTER ET SAUVEGARDER => q ) ");
 			scanValue = in.nextLine(); // Lecture de la console
 		}
-		
-		if(!joueur.NbNavireDeplacable()) {
-			System.out.println("\nTous vos navires ont été touché, vous ne pouvez donc pas en deplacer un. Nous modifions votre choix de coup a realiser en tirer !!!\n");
+
+		if (!joueur.NbNavireDeplacable()) {
+			System.out.println(
+					"\nTous vos navires ont ete touche, vous ne pouvez donc pas en deplacer un. Nous modifions votre choix de coup a realiser en tirer !!!\n");
 			scanValue = "t";
 		}
-		
-		if (scanValue.equals("t")) {
-			System.out.println(
-					"\nDonner les coordonnees d'ou vous voulez tirer ? (Coordonnees de type : Lettre Nombre (exemples : a 10 | m 16 / Dans le cas ou le nombre est un chiffre veuillez ajouter un zéro devant celui-ci (exemples: d 06 | k 02 ) )");
-			String coordonneesString = in.nextLine();
 
-			while ((coordonneesString.length() != 4) && !coordonneesString.contains(" ")) {
+		if (scanValue.equals("q")) {
+			OutilsJeu.sauvegardeFichier(joueur, robot);
+
+			ConfigurationJeu.QUITTER = true;
+
+		} else if (scanValue.equals("s")) {
+			OutilsJeu.sauvegardeFichier(joueur, robot);
+
+		} else if (scanValue.equals("t")) {
+			System.out.println(
+					"\nDonner les coordonnees d'ou vous voulez tirer ? (Coordonnees de type : Lettre Nombre (exemples : a 10 | m 16 / Dans le cas ou le nombre est un chiffre veuillez ajouter un zero devant celui-ci (exemples: d 06 | k 02 ) )");
+			String coordonneesString = in.nextLine();
+			String[] coordonneesSplit = coordonneesString.split(" ");
+
+			while ((!OutilsJeu.verifEntrees(coordonneesString)) || (!OutilsJeu.verifIndiceLigne(coordonneesSplit[0]))
+					|| (!OutilsJeu.verifIndiceColonne(coordonneesSplit[1]))) {
 				System.out.println(
-						"\nVous n\'avez pas rentré la valeur attendu, veuillez respecter la consigne demandé !!!!");
+						"\nVous n\'avez pas rentre la valeur attendu, veuillez respecter la consigne demande !!!!");
 				System.out.println(
-						"\nDonner les coordonnees d'ou vous voulez tirer ? (Coordonnees de type : Lettre Nombre (exemples : a 10 | m 16 / Dans le cas ou le nombre est un chiffre veuillez ajouter un zéro devant celui-ci (exemples: d 06 | k 02 ) )");
-				coordonneesString = null;
+						"\nDonner les coordonnees d'ou vous voulez tirer ? (Coordonnees de type : Lettre Nombre (exemples : a 10 | m 16 / Dans le cas ou le nombre est un chiffre veuillez ajouter un zero devant celui-ci (exemples: d 06 | k 02 ) )");
 				coordonneesString = in.nextLine(); // Lecture de la console
+				coordonneesSplit = coordonneesString.split(" ");
 			}
 
 			Coordonnees coordonnees = OutilsJeu.traduitCoordonnees(coordonneesString);
@@ -127,17 +194,20 @@ public class Partie {
 			int idNavire = in.nextInt(); // Lecture de la console
 			while (!(idNavire >= 1 && idNavire <= 4) || !joueur.verifNavireDispo(idNavire)) {
 				System.out.println(
-						"\nVous n\'avez pas rentré la valeur attendu ou ce navire est indisponible, veuillez respecter la consigne demandé ou le type de navire demander n'est plus disponible !!!!");
+						"\nVous n\'avez pas rentre la valeur attendu ou ce navire est indisponible, veuillez respecter la consigne demande ou le type de navire demander n'est plus disponible !!!!");
 				System.out.println(
-						"\nAvec quel type de navire voulez-vous tirer, regardez votre carte pour ne pas choisir un Navire coulé ? (CUIRASSE => 1 | CROISSEUR => 2 | DESTROYER => 3 | SOUS-MARAIN => 4) ");
+						"\nAvec quel type de navire voulez-vous tirer, regardez votre carte pour ne pas choisir un Navire coule ? (CUIRASSE => 1 | CROISSEUR => 2 | DESTROYER => 3 | SOUS-MARAIN => 4) ");
 				idNavire = in.nextInt(); // Lecture de la console
+			}
+
+			if (idNavire == 3) {
+				System.out.println(
+						"\nVous avez choisi de tirer avec un destroyeur et comme il vous reste des fusee eclairante, vous en tirez une !");
 			}
 
 			joueur.tirer(coordonnees, idNavire);
 
 			if (idNavire != 3) {
-				joueur.afficheNbTouche();
-
 				robot.verifNavireCoule();
 				System.out.println("NOMBRE DE NAVIRE COULE :" + robot.getNbNavireCoule());
 			}
@@ -146,17 +216,17 @@ public class Partie {
 			affichageCLI.afficheGrilleEnnemi(grilleEnnemi, modeTriche);
 
 		} else {
-			joueur.afficheFlotteNumerote();
+			affichageCLI.afficheFlotteNumerote(joueur);
 
 			System.out.println(
-					"\nDonner le numéro du navire que vous souhaitez deplacer ? (Voir la carte ci-dessus : )  )");
+					"\nDonner le numero du navire que vous souhaitez deplacer ? (Voir la carte ci-dessus : )  )");
 			int indiceNavire = in.nextInt();
 
-			while (!(indiceNavire >= 0 && indiceNavire <= 9) && !joueur.verifDeplacable(indiceNavire)) {
+			while (!(indiceNavire >= 0 && indiceNavire <= 9) || !joueur.verifNavireDeplacable(indiceNavire)) {
 				System.out.println(
-						"\nLe Navire choisi est touché ou coulé il ne peut donc pas se deplacer,choississez en un autre !!!!");
+						"\nLe Navire choisi est touche ou coule il ne peut donc pas se deplacer,choississez en un autre !!!!");
 				System.out.println(
-						"\nDonner le numéro du navire que vous souhaitez deplacer ? (Voir la carte ci-dessus : )  ");
+						"\nDonner le numero du navire que vous souhaitez deplacer ? (Voir la carte ci-dessus : )  ");
 				indiceNavire = in.nextInt(); // Lecture de la console
 			}
 
@@ -166,7 +236,7 @@ public class Partie {
 
 			while (!(direction >= 0 && direction <= 3)) {
 				System.out.println(
-						"\nVous n\'avez pas rentré la valeur attendu, veuillez respecter la consigne demandé !!!!");
+						"\nVous n\'avez pas rentre la valeur attendu, veuillez respecter la consigne demande !!!!");
 				System.out.println(
 						"\nDonner la direction d'ou vous voulez vous deplacer ? (Direction : Gauche => 0 | Haut => 1 | Droite => 2 | Bas => 3 )  )");
 				direction = in.nextInt(); // Lecture de la console
@@ -174,20 +244,24 @@ public class Partie {
 
 			while (!joueur.deplacer(indiceNavire, direction)) {
 				System.out.println(
-						"\nLe deplacement est impossible soit car : \n\t - La case est déjà prise \n\t - Le bateau touche les bornes de la carte \n\t - Le bateau choisi n'est pas dans le bon sens ( Exemple : Bateau Horizontale et deplacement en haut => IMPOSSIBLE )");
+						"\nLe deplacement est impossible soit car : \n\t - La case est deja prise \n\t - Le bateau touche les bornes de la carte \n\t - Le bateau choisi n'est pas dans le bon sens ( Exemple : Bateau Horizontale et deplacement en haut => IMPOSSIBLE )");
 
 				System.out.println(
 						"\nDonner la direction d'ou vous voulez vous deplacer ? (Direction : Gauche => 0 | Haut => 1 | Droite => 2 | Bas => 3 ) ");
 				direction = in.nextInt(); // Lecture de la console
 			}
-			robot.afficheFlotteNumerote();
-			System.out.println("\nAffichage de votre carte après déplacement de votre navire : \n");
+
+			System.out.println("\nAffichage de votre carte après deplacement de votre navire : \n");
 
 			affichageCLI.afficheGrille(grilleJoueur);
 
 		}
 	}
 
+	/**
+	 * Methode lancant le script du tour du Robot
+	 * 
+	 */
 	public void tourRobot() {
 		System.out.println("\n-------------------------------------------------\n");
 
@@ -195,24 +269,23 @@ public class Partie {
 				.println("\nROBOT voulez-vous tirer ou deplacer un de vos navires ? ( TIRER => t et DEPLACER => d ) ");
 
 		String scanValue = robot.coupAleatoire();// Lecture de la console
-//		String scanValue = "d";// Lecture de la console
-		
-		if(!joueur.NbNavireDeplacable()) {
-			System.out.println("\nTous vos navires ont été touché, vous ne pouvez donc pas en deplacer un. Nous modifions votre choix de coup a realiser en tirer !!!\n");
+//		String scanValue = "t";// Lecture de la console
+
+		if (!joueur.NbNavireDeplacable()) {
+			System.out.println(
+					"\nTous vos navires ont ete touche, vous ne pouvez donc pas en deplacer un. Nous modifions votre choix de coup a realiser en tirer !!!\n");
 			scanValue = "t";
 		}
-		
+
 		if (scanValue.equals("t")) {
 			System.out.println("\nROBOT a choisi de tirer !!!");
 
-			System.out.println("\nChoix des coordonnées !!!!");
+			System.out.println("\nChoix des coordonnees !!!!");
 			Coordonnees coordonnees = OutilsJeu.generateurCoordonneesAleatoire();
-			
+
 			System.out.println(
 					"\nChoix du navire avec lequel le ROBOT veur tirer ? (CUIRASSE => 1 | CROISSEUR => 2 | DESTROYER => 3 | SOUS-MARAIN => 4) ");
-			
-			robot.afficheFlotteNumerote();
-			
+
 			int idNavire = OutilsJeu.idNavireAleatoire();
 			System.out.println("\nNAVIRE CHOISI: " + idNavire);
 			while (!robot.verifNavireDispo(idNavire)) {
@@ -226,8 +299,6 @@ public class Partie {
 			robot.tirer(coordonnees, idNavire);
 
 			if (idNavire != 3) {
-				robot.afficheNbTouche();
-
 				joueur.verifNavireCoule();
 				System.out.println("NOMBRE DE NAVIRE COULE :" + joueur.getNbNavireCoule());
 			}
@@ -237,32 +308,33 @@ public class Partie {
 		} else {
 			System.out.println("\nROBOT a choisi de deplacer un navire !!!");
 
-			System.out.println("\nChoix aleatoire du navire à deplacer ? ");
+			System.out.println("\nChoix aleatoire du navire a deplacer ? ");
 
-			robot.afficheFlotteNumerote();
+			affichageCLI.afficheFlotteNumerote(robot);
 
 			int indiceNavire = OutilsJeu.numNavireDeplacer();
-//			int indiceNavire = 0;
-			System.out.println("\nVERIF DEPLACABLE  : " + robot.verifDeplacable(indiceNavire));
-			System.out.println("NAVIRE CHOISI : " + indiceNavire);
-			while (!robot.verifDeplacable(indiceNavire)) {
-				System.out.println(robot.verifDeplacable(indiceNavire));
 
-				System.out.println("VERIF DEPLACABLE  : " + robot.verifDeplacable(indiceNavire));
+			System.out.println("\nVERIF DEPLACABLE  : " + robot.verifNavireDeplacable(indiceNavire));
+			System.out.println("NAVIRE CHOISI : " + indiceNavire);
+			while (!robot.verifNavireDeplacable(indiceNavire)) {
+				affichageCLI.afficheFlotteNumerote(robot);
+				System.out.println(robot.verifNavireDeplacable(indiceNavire));
+
+				System.out.println("VERIF DEPLACABLE  : " + robot.verifNavireDeplacable(indiceNavire));
 				System.out.println("NAVIRE CHOISI : " + indiceNavire);
 				indiceNavire = OutilsJeu.numNavireDeplacer();
 			}
-			System.out.println("VERIF DEPLACABLE  : " + robot.verifDeplacable(indiceNavire));
+			System.out.println("VERIF DEPLACABLE  : " + robot.verifNavireDeplacable(indiceNavire));
 			System.out.println("NAVIRE CHOISI : " + indiceNavire);
 
-			System.out.println("\nChoix aleatoire de la direction d'ou vous voulez vous deplacer ?   (Direction : Gauche => 0 | Haut => 1 | Droite => 2 | Bas => 3 ) ");
+			System.out.println(
+					"\nChoix aleatoire de la direction d'ou vous voulez vous deplacer ?   (Direction : Gauche => 0 | Haut => 1 | Droite => 2 | Bas => 3 ) ");
 			int direction = robot.directionAleatoire();
-//			int direction = 0;
 
-			while (!robot.checkDeplacement(indiceNavire, direction)) {
+			while (!robot.checkDeplacementAleatoire(indiceNavire, direction)) {
 
 				System.out.println(
-						"\nLe deplacement est impossible soit car : \n\t - La case est déjà prise \n\t - Le bateau coule les bornes de la carte \n\t - Le bateau choisi n'est pas dans le bon sens ( Exemple : Bateau Horizontale et deplacement en haut => IMPOSSIBLE");
+						"\nLe deplacement est impossible soit car : \n\t - La case est deja prise \n\t - Le bateau coule les bornes de la carte \n\t - Le bateau choisi n'est pas dans le bon sens ( Exemple : Bateau Horizontale et deplacement en haut => IMPOSSIBLE");
 
 				System.out.println(
 						"\nDonner la direction d'ou vous voulez vous deplacer ? (Direction : Gauche => 0 | Haut => 1 | Droite => 2 | Bas => 3 )  ");
@@ -276,27 +348,18 @@ public class Partie {
 			robot.deplacer(indiceNavire, direction);
 
 			if (modeTriche) {
-				affichageCLI.afficheGrilleEnnemi(robot.getGrilleJoueur(),modeTriche);
+				affichageCLI.afficheGrilleEnnemi(robot.getGrilleJoueur(), modeTriche);
 			}
 
 		}
 
 	}
 
-//	public static void main(String[] args) {
-//
-//		try (Scanner in = new Scanner(System.in)) {
-//
-//			Partie p = new Partie(in);
-//
-//			while (true) {
-//				p.tourJoueur(in);
-//				p.tourRobot();
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//
-//	}
+	@Override
+	public String toString() {
+		return "Partie [nombreLigneGrille=" + nombreLigneGrille + ", nombreColonneGrille=" + nombreColonneGrille
+				+ ", grilleJoueur=" + grilleJoueur + ", grilleRobot=" + grilleRobot + ", joueur=" + joueur + ", robot="
+				+ robot + ", modeTriche=" + modeTriche + ", affichageCLI=" + affichageCLI + "]";
+	}
 
 }

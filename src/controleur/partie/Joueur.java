@@ -8,19 +8,29 @@
 package controleur.partie;
 
 import java.util.ArrayList;
+
 import java.util.Random;
 
 import config.ConfigurationJeu;
-import outils.OutilsJeu;
+import controleur.outils.OutilsJeu;
 import modele.grille.Bloc;
 import modele.grille.Grille;
 import modele.mobile.Coordonnees;
-import modele.mobile.Croisseur;
+import modele.mobile.Croiseur;
 import modele.mobile.Cuirasse;
 import modele.mobile.Destroyer;
 import modele.mobile.Flotte;
 import modele.mobile.Navire;
 import modele.mobile.SousMarin;
+
+/**
+ * Cette classe sert a la creation d'un objet Joueur. Le Joueur est compose de
+ * deux grilles : la sienne et celle de l'ennemi, une flotte : la liste de ses
+ * navires , listeDesCoordonneees: contenant une liste de coordonnees de la
+ * flotte. Nous l'avons nomme controleur car elle contient egalement les
+ * methodes servant aux actions des navires ( exemple : tourJoueur() ,
+ * tourRobot() , ...)
+ */
 
 public class Joueur {
 
@@ -34,6 +44,34 @@ public class Joueur {
 	private int NbBlocTouche;
 	private int NbNavireCoule;
 
+	/**
+	 * Premier Constructeur de la classe Joueur : Servant lors d'une nouvelle partie
+	 * @param grilleJoueur : grille du Joueur
+	 * @param grilleEnnemi : grille de l'ennemi
+	 * @param listeCoordonneesFlotte : liste de coordonnees de la Flotte du joueur
+	 * @param flotte : Liste des Navires du joueurs
+	 * @param nbBlocTouche : Nombre de blocs touche par l'adversaire
+	 * @param nbNavireCoule : Nombre de Navire que le joueur possede
+	 */
+	public Joueur(Grille carteJoueur, Grille carteEnnemi, Flotte flotte, int nbBlocTouche, int nbNavireCoule) {
+		this.grilleJoueur = carteJoueur;
+		this.grilleEnnemi = carteEnnemi;
+		this.listeCoordonneesFlotte = new ArrayList<Coordonnees>();
+		this.flotte = flotte;
+		placementFlotte();
+		NbBlocTouche = nbBlocTouche;
+		NbNavireCoule = nbNavireCoule;
+	}
+
+	/**
+	 * Second Constructeur de la classe Joueur : ervant lors du chargement d'une ancienne partie
+	 * @param grilleJoueur : grille du Joueur
+	 * @param grilleEnnemi : grille de l'ennemi
+	 * @param listeCoordonneesFlotte : liste de coordonnees de la Flotte du joueur
+	 * @param flotte : Liste des Navires du joueurs
+	 * @param nbBlocTouche : Nombre de blocs touche par l'adversaire
+	 * @param nbNavireCoule : Nombre de Navire que le joueur possede
+	 */
 	public Joueur(Grille carteJoueur, Grille carteEnnemi) {
 		this.grilleJoueur = carteJoueur;
 		this.grilleEnnemi = carteEnnemi;
@@ -67,11 +105,18 @@ public class Joueur {
 		return NbBlocTouche;
 	}
 
+	public void setNbNavireCoule(int nbNavireCoule) {
+		NbNavireCoule = nbNavireCoule;
+	}
+
 	public int getNbNavireCoule() {
 		return NbNavireCoule;
 	}
 
-	public void modifValueBlocs(Coordonnees c, int id) {
+	/**
+	 * Methode servant a Modifier les attributs du bloc dont les coordonnees sont donnes en parametre
+	 */
+	public void modifValueBlocs(Coordonnees c, int id, boolean coule) {
 
 		int BlocLigne = c.getLigne();
 		int BlocColonne = c.getColonne();
@@ -101,32 +146,57 @@ public class Joueur {
 		Bloc b = grilleJoueur.getBloc(BlocLigne, BlocColonne);
 
 		b.setValeur(value);
-	}
-
-	public void initializeNavire(Navire n) {
-		int id = n.getId();
-
-		for (Coordonnees c : n.getListeCoordonnees()) {
-			modifValueBlocs(c, id);
+		b.setIdNavire(id);
+		if (coule) {
+			b.setTouche(true);
+			b.setCoule(true);
 		}
 	}
 
+	/**
+	 * Methode servant a Modifier les blocs ou sont positionnes les navires
+	 */
+	public void initializeNavire(Navire n) {
+		int id = n.getId();
+		boolean coule = n.isCoule();
+
+		for (Coordonnees c : n.getListeCoordonnees()) {
+			modifValueBlocs(c, id, coule);
+		}
+	}
+
+	/**
+	 * Methode servant au placement de la flotte sur la grille 
+	 */
 	public void placementFlotte() {
 		for (Navire n : flotte.getListeNavire()) {
 			initializeNavire(n);
 		}
 	}
 
-	public boolean verifBoolean(int verif, int taille) {
+	/**
+	 * Methode servant a verfier si deux entier sont egaux
+	 * 
+	 * @param verif : entier a verifier
+	 * @param taille : taille du navire
+	 *
+	 * @return Vrai si egaux | Faux sinon
+	 */
+	public boolean verifEgal(int verif, int taille) {
 		if (verif != taille) {
-			System.out.println("VOTRE BATEAU NE PEUT PAS RENTRER !!!");
 			return false;
 		} else {
-			System.out.println("VOTRE BATEAU PEUT RENTRER !!!");
 			return true;
 		}
 	}
 
+	/**
+	 * Methode servant a verfier si une coordonnes appartient deja a celle d'un autre navire
+	 * 
+	 * @param c2 : coordonnees 
+	 *
+	 * @return Vrai si coordonnees deja prise | Faux sinon
+	 */
 	public boolean verifExistFlotte(Coordonnees c2) {
 		int verif = 0;
 		for (Coordonnees c1 : listeCoordonneesFlotte) {
@@ -141,6 +211,17 @@ public class Joueur {
 		}
 	}
 
+	/**
+	 * Methode servant au choix des Coordonnees aleatoire d'un Navire. Sert a savoir
+	 * si avec les coordonnees choisi, le navire rentre dans la grille
+	 * 
+	 * @param CoordLigne    : coordonnes de la ligne ou commencera le navire 
+	 * @param CoordColonne : coordonnes de la colonne ou commencera le navire 
+	 * @param taille : taille du navire 
+	 * @param direction : direction du navire 
+	 *
+	 * @return Liste de Coordonnees
+	 */
 	public ArrayList<Coordonnees> checkCoordonneesDisponible(int CoordLigne, int CoordColonne, int taille,
 			int direction) {
 		ArrayList<Coordonnees> c = new ArrayList<Coordonnees>();
@@ -178,7 +259,7 @@ public class Joueur {
 			throw new IllegalArgumentException("Unexpected value: " + direction);
 		}
 
-		if (verifBoolean(verif, taille)) {
+		if (verifEgal(verif, taille)) {
 			return c;
 		} else {
 			return null;
@@ -186,6 +267,17 @@ public class Joueur {
 
 	}
 
+	/**
+	 * Methode servant a la creation d'une liste aleatoire de Coordonnees d'un
+	 * Navire
+	 * 
+	 * @param taille    : taille du navire pour lequel il faut generer des
+	 *                  coordonneees
+	 * @param direction : direction du navire pour lequel il faut generer des
+	 *                  coordonneees
+	 *
+	 * @return Liste de Coordonnees
+	 */
 	public ArrayList<Coordonnees> listeCoordonneesAleatoire(int taille, int direction) {
 		Random r = new Random();
 		int CordLigne = r.nextInt(15) + 1;
@@ -195,20 +287,27 @@ public class Joueur {
 			CordLigne = r.nextInt(15) + 1;
 			CordColonne = r.nextInt(15) + 1;
 		}
-		System.out.println("COORD DE DEPART CHOISI: LIGNE=" + CordLigne + " || COLONNE=" + CordColonne + "\n");
 		ArrayList<Coordonnees> listeCoordonnees = checkCoordonneesDisponible(CordLigne, CordColonne, taille, direction);
 
 		for (Coordonnees coordonnees : listeCoordonnees) {
 			listeCoordonneesFlotte.add(coordonnees);
 		}
 
-		System.out.println("LISTE COORDONNEES FLOTTE : " + listeCoordonneesFlotte.toString());
-		System.out.println("SIZE : " + listeCoordonneesFlotte.size());
-
 		return listeCoordonnees;
 
 	}
 
+	/**
+	 * Methode servant a la generation d'une liste aleatoire de Coordonnees d'un
+	 * Navire
+	 * 
+	 * @param taille    : taille du navire pour lequel il faut generer des
+	 *                  coordonneees
+	 * @param direction : direction du navire pour lequel il faut generer des
+	 *                  coordonneees
+	 *
+	 * @return Liste de Coordonnees
+	 */
 	public ArrayList<Coordonnees> generationCoordonnees(int taille, int direction) {
 		ArrayList<Coordonnees> listeCoordonnees = new ArrayList<Coordonnees>();
 
@@ -217,9 +316,13 @@ public class Joueur {
 		return listeCoordonnees;
 	}
 
+	/**
+	 * Methode servant a generer un Cuirasse
+	 * 
+	 * @return Cuirasse
+	 */
 	public Cuirasse generationCuirasse() {
 		int direction = OutilsJeu.directionAleatoire();
-		System.out.println("\nLA DIRECTION DU CUIRASSE : " + direction);
 		ArrayList<Coordonnees> listeCoordCuirasse = generationCoordonnees(ConfigurationJeu.TAILLE_CUIRASSE, direction);
 
 		Cuirasse cuirasse = new Cuirasse(listeCoordCuirasse, direction);
@@ -228,21 +331,29 @@ public class Joueur {
 
 	}
 
-	public Croisseur generationCroisseur() {
+	/**
+	 * Methode servant a generer un Croiseur
+	 * 
+	 * @return Croiseur
+	 */
+	public Croiseur generationCroisseur() {
 		int direction = OutilsJeu.directionAleatoire();
-		System.out.println("\nLA DIRECTION DU CROISSEUR : " + direction);
 		ArrayList<Coordonnees> listeCoordCroisseur = generationCoordonnees(ConfigurationJeu.TAILLE_CROISSEUR,
 				direction);
 
-		Croisseur croisseur = new Croisseur(listeCoordCroisseur, direction);
+		Croiseur croiseur = new Croiseur(listeCoordCroisseur, direction);
 
-		return croisseur;
+		return croiseur;
 
 	}
 
+	/**
+	 * Methode servant a generer un Destroyer
+	 * 
+	 * @return Destroyer
+	 */
 	public Destroyer generationDestroyer() {
 		int direction = OutilsJeu.directionAleatoire();
-		System.out.println("\nLA DIRECTION DU DESTROYER : " + direction);
 		ArrayList<Coordonnees> listeCoordDestroyer = generationCoordonnees(ConfigurationJeu.TAILLE_DESTROYER,
 				direction);
 
@@ -251,9 +362,13 @@ public class Joueur {
 		return destroyer;
 	}
 
+	/**
+	 * Methode servant a generer un Sous Marin
+	 * 
+	 * @return Sous Marin
+	 */
 	public SousMarin generationSousMarin() {
 		int direction = OutilsJeu.directionAleatoire();
-		System.out.println("\nLA DIRECTION DU SOUS-MARIN : " + direction);
 		ArrayList<Coordonnees> listeCoordSousMarin = generationCoordonnees(ConfigurationJeu.TAILLE_SOUSMARIN,
 				direction);
 
@@ -262,7 +377,14 @@ public class Joueur {
 		return sousMarin;
 	}
 
-	public Flotte generationFlotte(Grille carteJoueur) {
+	/**
+	 * Methode servant a generer une flotte aleatoire
+	 * 
+	 * @param grilleJoueur : grille du joueur sur laquelle sera genere la flotte
+	 *
+	 * @return Flotte , liste de tous les navires
+	 */
+	public Flotte generationFlotte(Grille grilleJoueur) {
 		ArrayList<Navire> listeNavire = new ArrayList<Navire>();
 
 		listeNavire.add(generationCuirasse());
@@ -279,166 +401,119 @@ public class Joueur {
 			listeNavire.add(generationSousMarin());
 		}
 		Flotte f = new Flotte(listeNavire);
-		System.out.println("LA FLOTTE : " + f.toString());
 
 		return f;
 	}
 
+	/**
+	 * Methode servant a mettre a jour les blocs touche par le tire
+	 * 
+	 * @param coordonnees : coordonnees de l'impact principal du tir
+	 * @param impact      : taille de l'impact du tir
+	 * @param id          : du navire avec lequel on tire
+	 *
+	 */
 	public void stockBlocTouche(Coordonnees coordonnees, int impact, int id) {
 		int coordX = coordonnees.getLigne();
 		int coordY = coordonnees.getColonne();
 
 		Grille carteEnemi = grilleEnnemi;
 
+		ArrayList<Coordonnees> listCoordonnees = new ArrayList<>();
+
+		listCoordonnees.add(new Coordonnees(coordX, coordY));
+
+		listCoordonnees.add(new Coordonnees(coordX + 1, coordY));
+		listCoordonnees.add(new Coordonnees(coordX - 1, coordY));
+		listCoordonnees.add(new Coordonnees(coordX, coordY + 1));
+		listCoordonnees.add(new Coordonnees(coordX, coordY - 1));
+
+		listCoordonnees.add(new Coordonnees(coordX + 1, coordY + 1));
+		listCoordonnees.add(new Coordonnees(coordX - 1, coordY - 1));
+		listCoordonnees.add(new Coordonnees(coordX - 1, coordY + 1));
+		listCoordonnees.add(new Coordonnees(coordX + 1, coordY - 1));
+
 		Bloc b = null;
 		if (impact == 9) {
 
 			System.out.println("\nTIRE DE CUIRASSE EN " + coordonnees.toString() + "\n");
 
+			for (int i = 0; i < impact; i++) {
+				Coordonnees c = listCoordonnees.get(i);
+				b = carteEnemi.getBloc(c);
+				if (b.getIdNavire() != 4) {
+					b.setTouche(true);
+				}
+
+			}
+
 			System.out.println("\nIMPACT DE : " + impact + " CASES !!!\n");
-			b = carteEnemi.getBloc(coordX, coordY);
-			b.setTouche(true);
-			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
-				b.setValeur("//");
-			}
-
-			b = carteEnemi.getBloc(coordX - 1, coordY - 1);
-			b.setTouche(true);
-			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
-				b.setValeur("//");
-			}
-
-			b = carteEnemi.getBloc(coordX + 1, coordY + 1);
-			b.setTouche(true);
-			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
-				b.setValeur("//");
-			}
-
-			b = carteEnemi.getBloc(coordX + 1, coordY);
-			b.setTouche(true);
-			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
-				b.setValeur("//");
-			}
-
-			b = carteEnemi.getBloc(coordX, coordY + 1);
-			b.setTouche(true);
-			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
-				b.setValeur("//");
-			}
-
-			b = carteEnemi.getBloc(coordX - 1, coordY);
-			b.setTouche(true);
-			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
-				b.setValeur("//");
-			}
-
-			b = carteEnemi.getBloc(coordX, coordY - 1);
-			b.setTouche(true);
-			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
-				b.setValeur("//");
-			}
-
-			b = carteEnemi.getBloc(coordX + 1, coordY - 1);
-			b.setTouche(true);
-			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
-				b.setValeur("//");
-			}
-
-			b = carteEnemi.getBloc(coordX - 1, coordY + 1);
-			b.setTouche(true);
-			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
-				b.setValeur("//");
-			}
 
 		} else if (impact == 4) {
 
 			System.out.println("\nTIRE DE CROISSEUR EN " + coordonnees.toString() + "\n");
 
+			for (int i = 0; i <= impact; i++) {
+				Coordonnees c = listCoordonnees.get(i);
+				b = carteEnemi.getBloc(c);
+				if (b.getIdNavire() != 4) {
+					b.setTouche(true);
+				}
+			}
+
 			System.out.println("\nIMPACT DE : " + impact + " CASES !!!\n");
-			b = carteEnemi.getBloc(coordX, coordY);
-			b.setTouche(true);
-			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
-				b.setValeur("//");
-			}
 
-			b = carteEnemi.getBloc(coordX - 1, coordY);
-			b.setTouche(true);
-			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
-				b.setValeur("//");
-			}
-
-			b = carteEnemi.getBloc(coordX + 1, coordY);
-			b.setTouche(true);
-			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
-				b.setValeur("//");
-			}
-
-			b = carteEnemi.getBloc(coordX, coordY - 1);
-			b.setTouche(true);
-			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
-				b.setValeur("//");
-			}
-
-			b = carteEnemi.getBloc(coordX, coordY + 1);
-			b.setTouche(true);
-			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
-				b.setValeur("//");
-			}
 		} else if (id == 3 && ConfigurationJeu.NB_FUSEE_ECLAIRANTE > 0) {
 
 			System.out.println("\nTIRE DE FUSEE ECLAIRANTE EN " + coordonnees.toString() + "\n");
 
-			b = carteEnemi.getBloc(coordX, coordY);
-			if (!b.isTouche()) {
-				b.setEclaire(true);
+			for (int i = 0; i <= 4; i++) {// 4 IMPACTS
+				Coordonnees c = listCoordonnees.get(i);
+				b = carteEnemi.getBloc(c);
+
+				if (!b.isTouche()) {
+					b.setEclaire(true);
+				}
 			}
 
-			b = carteEnemi.getBloc(coordX - 1, coordY);
-			if (!b.isTouche()) {
-				b.setEclaire(true);
-			}
-
-			b = carteEnemi.getBloc(coordX + 1, coordY);
-			if (!b.isTouche()) {
-				b.setEclaire(true);
-			}
-
-			b = carteEnemi.getBloc(coordX, coordY - 1);
-			if (!b.isTouche()) {
-				b.setEclaire(true);
-			}
-
-			b = carteEnemi.getBloc(coordX, coordY + 1);
-			if (!b.isTouche()) {
-				b.setEclaire(true);
-			}
+			System.out.println("\nECLAIRAGE DE : " + 4 + " CASES !!!\n");
 			ConfigurationJeu.NB_FUSEE_ECLAIRANTE--;
+			System.out.println("\nIl VOUS RESTE " + ConfigurationJeu.NB_FUSEE_ECLAIRANTE + " FUSEE ECLAIRANTE.");
+
 		} else if (id == 3) {
 			System.out.println("\nTIRE DE DESTROYEUR EN " + coordonnees.toString() + "\n");
 
-			System.out.println("\nIMPACT DE : " + impact + " CASES !!!\n");
-
-			b = carteEnemi.getBloc(coordX, coordY);
-			b.setTouche(true);
-			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
-				b.setValeur("//");
+			for (int i = 0; i < impact; i++) {
+				Coordonnees c = listCoordonnees.get(i);
+				b = carteEnemi.getBloc(c);
+				if (b.getIdNavire() != 4) {
+					b.setTouche(true);
+				}
 			}
+
+			System.out.println("\nIMPACT DE : " + impact + " CASES !!!\n");
 
 		} else {
 			System.out.println("\nTIRE DE SOUS-MARIN EN " + coordonnees.toString() + "\n");
-			System.out.println("\nIMPACT DE : " + impact + " CASES !!!\n");
 
-			b = carteEnemi.getBloc(coordX, coordY);
-			b.setTouche(true);
-			if (!b.getValeur().equals("  ") && !b.getValeur().equals("::")) {
-				b.setValeur("//");
+			for (int i = 0; i < impact; i++) {
+				Coordonnees c = listCoordonnees.get(i);
+				b = carteEnemi.getBloc(c);
+				b.setTouche(true);
 			}
 
+			System.out.println("\nIMPACT DE : " + impact + " CASES !!!\n");
 		}
 
 	}
 
-	public void updateNavireTouche(Coordonnees coordonnees) {
+	/**
+	 * Methode servant a modifier le booleen touche des navires apres un tire
+	 * 
+	 * @param id : du navire avec lequel on a tire
+	 *
+	 */
+	public void updateNavireTouche(int id) {
 		Bloc[][] blocs = grilleJoueur.getBlocs();
 
 		ArrayList<Navire> listeNav = flotte.getListeNavire();
@@ -457,13 +532,28 @@ public class Joueur {
 					verif++;
 				}
 			}
-			if (verif > 0) {
-				Navire navire = listeNav.get(i);
-				navire.setTouche(true);
+			Navire navire = listeNav.get(i);
+			if (navire.getId() != 4) {
+				if (verif > 0) {
+					navire.setTouche(true);
+				}
+			} else {
+				if (navire.getId() == id) {
+					navire.setTouche(true);
+				}
 			}
+
 		}
 	}
 
+	/**
+	 * Methode servant a tirer sur les coordonnes donnee en parametre et avec la
+	 * puissance du navire ayant l'id en parametre
+	 * 
+	 * @param coordonnees : coordonnees d'ou l'on souhaite tirer
+	 * @param id          : du navire avec lequel on souhaite tirer
+	 *
+	 */
 	public void tirer(Coordonnees coordonnees, int id) {
 
 		System.out.println(coordonnees);
@@ -478,15 +568,28 @@ public class Joueur {
 			stockBlocTouche(coordonnees, ConfigurationJeu.IMPACT_SOUSMARIN, id);
 		}
 
-		updateNavireTouche(coordonnees);
+		updateNavireTouche(id);
 	}
 
+	/**
+	 * Methode servant a remettre a jour le signe des navires sur les nuoveaux blocs
+	 * ou il a ete deplacer
+	 */
 	public void MAJSigne(Navire navire) {
 		for (Coordonnees c : navire.getListeCoordonnees()) {
-			modifValueBlocs(c, navire.getId());
+			modifValueBlocs(c, navire.getId(), navire.isCoule());
 		}
 	}
 
+	/**
+	 * Methode servant a remettre un neuf un bloc apres deplacement d'un navire
+	 * 
+	 * @param navire               : navire pour lequel on cherche si le futur
+	 *                             deplacement est coherent
+	 * @param directionDeplacement : direction dans laquelle il sera deplacer
+	 *
+	 * @return Vrai si deplacement coherant , Faux sinon
+	 */
 	public void DeleteSigne(Navire navire) {
 		String value = "  ";
 		int BlocLigne = 0;
@@ -498,9 +601,20 @@ public class Joueur {
 
 			Bloc b = grilleJoueur.getBloc(BlocLigne, BlocColonne);
 			b.setValeur(value);
+			b.setIdNavire(0);
 		}
 	}
 
+	/**
+	 * Methode servant a savoir si le futur deplacement du Navire est coherent avec
+	 * sa position actuelle
+	 * 
+	 * @param navire               : navire pour lequel on cherche si le futur
+	 *                             deplacement est coherent
+	 * @param directionDeplacement : direction dans laquelle il sera deplacer
+	 *
+	 * @return Vrai si deplacement coherant , Faux sinon
+	 */
 	public boolean deplacementCoherent(Navire navire, int directionDeplacement) {
 		ArrayList<Coordonnees> listeCoord = navire.getListeCoordonnees();
 		Coordonnees cDebut;
@@ -526,6 +640,16 @@ public class Joueur {
 		}
 	}
 
+	/**
+	 * Methode servant a savoir si le futur deplacement du Navire dans la direction
+	 * en parametre est possible
+	 * 
+	 * @param navire               : navire pour lequel on cherche si le futur
+	 *                             deplacement est possible
+	 * @param directionDeplacement : direction dans laquelle il sera deplacer
+	 *
+	 * @return Vrai si deplacement possible, Faux sinon
+	 */
 	public boolean checkBlocDisponible(Navire navire, int directionDeplacement) {
 		Coordonnees coordonneesDebutNavire = null;
 		int BlocLigne = 0;
@@ -589,27 +713,147 @@ public class Joueur {
 
 	}
 
-//	public void deplacer(Navire navire, int directionDeplacement) {
-//		if (deplacementCoherent(navire, directionDeplacement)) {
-//			if (checkBlocDisponible(navire, directionDeplacement)) {
-//				DeleteSigne(navire);
-//				navire.deplacer(directionDeplacement);
-//				MAJSigne(navire);
-//			}
-//		}
-//
-//	}
+	/**
+	 * Methode servant a recuperer les coordonnees donnee en parametre apres le
+	 * deplacement dans la direction donnee en parametre
+	 * 
+	 * @param directionDeplacement : direction dans laquelle il faut deplacer le
+	 *                             Navire ( 0 : gauche | 1: haut | 2 : droite | 3 :
+	 *                             bas )
+	 * 
+	 * @param c                    : Coordonnee du Navire avant deplacement
+	 *
+	 * @return La coordonnees du Navire après deplacement
+	 */
+	private Coordonnees MajCoordonnees(int directionDeplacement, Coordonnees c) {
+		int coordLigne = 0;
+		int coordColonne = 0;
+		switch (directionDeplacement) {
+		case 0: { // gauche
+			coordLigne = c.getLigne();
+			coordColonne = c.getColonne() - 1;
+			break;
+		}
+		case 1: { // haut
+			coordLigne = c.getLigne() - 1;
+			coordColonne = c.getColonne();
+			break;
+		}
+		case 2: { // droite
+			coordLigne = c.getLigne();
+			coordColonne = c.getColonne() + 1;
+			break;
+		}
+		case 3: { // bas
+			coordLigne = c.getLigne() + 1;
+			coordColonne = c.getColonne();
+			break;
+		}
+		default:
+			throw new IllegalArgumentException("Unexpected value: " + directionDeplacement);
+		}
 
+		return new Coordonnees(coordLigne, coordColonne);
+	}
+
+	/**
+	 * Methode servant a renvoyer la coordonnees du bloc en tete du Navire apres son
+	 * deplacement dans la direction donnee
+	 * 
+	 * @param directionDeplacement : direction dans laquelle il faut deplacer le
+	 *                             Navire ( 0 : gauche | 1: haut | 2 : droite | 3 :
+	 *                             bas )
+	 *
+	 * @return Les coordonnees du bloc en tete du navire apres son deplacement.
+	 */
+	public Coordonnees validationFuturesCoordonnees(Navire navire, int directionDeplacement) {
+		ArrayList<Coordonnees> listeCoordonnees = navire.getListeCoordonnees();
+		int taille = navire.getTaille();
+		int coordLigne = 0;
+		int coordColonne = 0;
+		switch (directionDeplacement) {
+		case 0: { // gauche
+			coordLigne = listeCoordonnees.get(0).getLigne();
+			coordColonne = listeCoordonnees.get(0).getColonne() - 1;
+
+			break;
+		}
+		case 1: { // haut
+			coordLigne = listeCoordonnees.get(0).getLigne() - 1;
+			coordColonne = listeCoordonnees.get(0).getColonne();
+			break;
+		}
+		case 2: { // droite
+			coordLigne = listeCoordonnees.get(taille - 1).getLigne();
+			coordColonne = listeCoordonnees.get(taille - 1).getColonne() + 1;
+			break;
+		}
+		case 3: { // bas
+			coordLigne = listeCoordonnees.get(taille - 1).getLigne() + 1;
+			coordColonne = listeCoordonnees.get(taille - 1).getColonne();
+			break;
+		}
+		default:
+			throw new IllegalArgumentException("Unexpected value: " + directionDeplacement);
+		}
+		return new Coordonnees(coordLigne, coordColonne);
+	}
+
+	/**
+	 * Methode servant a savoir si un Navire et deplacable dans la direction donnee
+	 * en parametre
+	 * 
+	 * @param directionDeplacement : direction dans laquelle il faut deplacer le
+	 *                             Navire ( 0 : gauche | 1: haut | 2 : droite | 3 :
+	 *                             bas )
+	 *
+	 * @return Vrai : si le navire peut etre deplace dans la direction donnee
+	 */
+	public boolean navireDeplacable(Navire navire, int directionDeplacement) {
+		Coordonnees c = validationFuturesCoordonnees(navire, directionDeplacement);
+		if (c.valideCoordonnees()) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Methode servant a deplacer un Navire dans la direction donne en parametre
+	 * 
+	 * @param directionDeplacement : direction dans laquelle il faut deplacer le
+	 *                             Navire ( 0 : gauche | 1: haut | 2 : droite | 3 :
+	 *                             bas )
+	 *
+	 */
+	public void deplaceNavire(Navire navire, int directionDeplacement) {
+		ArrayList<Coordonnees> listeCoordonnees = navire.getListeCoordonnees();
+
+		if (navireDeplacable(navire, directionDeplacement)) {
+			for (int i = 0; i < listeCoordonnees.size(); i++) {
+				Coordonnees c = listeCoordonnees.get(i);
+				listeCoordonnees.set(i, MajCoordonnees(directionDeplacement, c));
+			}
+		}
+	}
+
+	/**
+	 * Methode servant a deplacer et a verifier si le navire dont l'indice est en
+	 * parametre peut se deplacer dans la direction donne en parametre
+	 * 
+	 * @param indiceNavire         : indice du navire a deplacer
+	 * @param directionDeplacement : direction dans laquelle il faut le deplacer
+	 *
+	 * @return Vrai si deplacement , Faux sinon
+	 */
 	public boolean deplacer(int indiceNavire, int directionDeplacement) {
 		boolean verif = false;
 
 		Navire navire = flotte.getListeNavire().get(indiceNavire);
-		System.out.println(navire.toString());
 		if (!navire.isTouche()) {
 			if (deplacementCoherent(navire, directionDeplacement)) {
 				if (checkBlocDisponible(navire, directionDeplacement)) {
 					DeleteSigne(navire);
-					navire.deplacer(directionDeplacement);
+					deplaceNavire(navire, directionDeplacement);
 					MAJSigne(navire);
 					verif = true;
 				}
@@ -621,6 +865,16 @@ public class Joueur {
 		return verif;
 	}
 
+	/**
+	 * Methode servant a verifier si la coordonneees en parametre appartient a la
+	 * liste de coordonnees en parametre
+	 * 
+	 * @param c2    : coordonnees pour laquelle on veut savoir si elle appartient a
+	 *              la liste
+	 * @param liste : liste de coordonnees
+	 *
+	 * @return Vrai si appartient , Faux sinon
+	 */
 	public boolean verifExistListe(Coordonnees c2, ArrayList<Coordonnees> liste) {
 		int verif = 0;
 		for (Coordonnees c1 : liste) {
@@ -635,6 +889,15 @@ public class Joueur {
 		}
 	}
 
+	/**
+	 * Methode servant a recuperer l'indice du navire possedant le bloc dont les
+	 * coordonneees sont en parametre
+	 * 
+	 * @param CoordLigne   : indice de la ligne ou est le bloc
+	 * @param CoordColonne : indice de la colonne ou est le bloc
+	 *
+	 * @return L'indice du bloc ( Entre 0 et 9 inclus )
+	 */
 	public int recupIndice(int CoordLigne, int CoordColonne) {
 		Coordonnees coordBloc = new Coordonnees(CoordLigne, CoordColonne);
 		ArrayList<Navire> listeNaviresFlottes = flotte.getListeNavire();
@@ -647,64 +910,24 @@ public class Joueur {
 		return 44;
 	}
 
-//	public void afficheFlotteNumerote() {
-//		Bloc[][] blocs = getGrilleJoueur().getBlocs();
+//	public void afficheNbTouche() {
+//		int nbAvantIncrement = this.NbBlocTouche;
 //
-//		for (int i = 0; i < ConfigurationJeu.NB_LIGNE - 1; i++) {
-//			for (int j = 0; j < ConfigurationJeu.NB_COLONNE - 1; j++) {
-//				if (i < 1 || j < 1) {
-//					System.out.print("[" + blocs[i][j].getValeur() + "]");
-//				} else if (!blocs[i][j].getValeur().equals("  ") && !blocs[i][j].isTouche()) {
-//					System.out.print("[0" + recupIndice(i, j) + "]");
-//				} else if (blocs[i][j].isTouche()) {
-//					System.out.print("[//]");
-//				} else if (blocs[i][j].isCoule()) {
-//					System.out.print("[::]");
-//				} else {
-//					System.out.print("[--]");
-//				}
-//			}
-//			System.out.println();
+//		incrementeNombreBlocTouche();
+//		int nbApresIncrement = this.NbBlocTouche;
+//
+//		int difference = nbApresIncrement - nbAvantIncrement;
+//
+//		if (difference > 0) {
+//			System.out.println("\nBRAVO !!! Vous avez touche " + difference + " bloc contenant un navire.");
+//		} else {
+//			System.out.println("\nVous n'avez touche aucun bloc contenant un navire.");
 //		}
 //	}
 
-	public void afficheFlotteNumerote() {
-		
-		System.out.println("\nAFFICHAGE GRILLE NUMEROTE : \n");
-		
-		Bloc[][] blocs = getGrilleJoueur().getBlocs();
-
-		for (int i = 0; i < ConfigurationJeu.NB_LIGNE - 1; i++) {
-			for (int j = 0; j < ConfigurationJeu.NB_COLONNE - 1; j++) {
-				if ((i < 1 || j < 1) || blocs[i][j].getValeur().equals("//") || blocs[i][j].getValeur().equals("::")) {
-					System.out.print("[" + blocs[i][j].getValeur() + "]");
-				} else if (!blocs[i][j].getValeur().equals("  ") && !blocs[i][j].getValeur().equals("//")
-						&& !blocs[i][j].getValeur().equals("::")) {
-					System.out.print("[0" + recupIndice(i, j) + "]");
-				} else {
-					System.out.print("[--]");
-				}
-			}
-			System.out.println();
-		}
-	}
-
-	public void afficheNbTouche() {
-		int nbAvantIncrement = this.NbBlocTouche;
-
-		incrementeNombreBlocTouche();
-		int nbApresIncrement = this.NbBlocTouche;
-
-		int difference = nbApresIncrement - nbAvantIncrement;
-
-		if (difference > 0) {
-			System.out.println("\nBRAVO !!! Vous avez touche " + difference + " bloc contenant un navire.");
-		} else {
-			System.out.println("\nVous n'avez touché aucun bloc contenant un navire.");
-		}
-
-	}
-
+	/**
+	 * Mehode servant a incrementer le nombre de Bloc Touche chez l'adversaire
+	 */
 	public void incrementeNombreBlocTouche() {
 		Bloc[][] blocs = grilleEnnemi.getBlocs();
 
@@ -717,6 +940,10 @@ public class Joueur {
 		}
 	}
 
+	/**
+	 * Methode servant a mettre a jour le nombre de navire coule chez le joueur
+	 * 
+	 */
 	public void verifNavireCoule() {
 		ArrayList<Navire> listeNav = flotte.getListeNavire();
 
@@ -745,21 +972,10 @@ public class Joueur {
 		}
 	}
 
-	public void ToucheSigne(Navire navire) {
-		String value = "//";
-		int BlocLigne = 0;
-		int BlocColonne = 0;
-		for (Coordonnees c : navire.getListeCoordonnees()) {
-
-			BlocLigne = c.getLigne();
-			BlocColonne = c.getColonne();
-
-			Bloc b = grilleJoueur.getBloc(BlocLigne, BlocColonne);
-			b.setCoule(true);
-			b.setValeur(value);
-		}
-	}
-
+	/**
+	 * Methode servant a modifier le signe des blocs d'un navire lorsqu'il est coule
+	 *
+	 */
 	public void CouleSigne(Navire navire) {
 		String value = "::";
 		int BlocLigne = 0;
@@ -775,13 +991,12 @@ public class Joueur {
 		}
 	}
 
-	public boolean verifLoose() {
-		if (NbNavireCoule == 10) {
-			return true;
-		}
-		return false;
-	}
-
+	/**
+	 * Methode servant a choisir un coup aleatoire
+	 * 
+	 *
+	 * @return Le coup aleatoire choisi
+	 */
 	public String coupAleatoire() {
 		int valeurAleatoire = OutilsJeu.valeurAleatoire(2);
 		if (valeurAleatoire == 1) {
@@ -791,19 +1006,38 @@ public class Joueur {
 		}
 	}
 
-	public int idNavireDeplacement() {
+	/**
+	 * Methode servant a choisir l'indice d'un Navire de facon aleatoire
+	 * 
+	 *
+	 * @return L'indice du navire a deplacer ( Entre 0 et 9 inclus)
+	 */
+	public int indiceNavireDeplacement() {
 		return OutilsJeu.valeurZeroAleatoire(10);
 	}
 
+	/**
+	 * Methode servant a choisir une direction aleatoire
+	 * 
+	 * @return La valeur de la direction choisi aleatoirement ( 0 : gauche | 1 :
+	 *         haut | 2 : droite | 3 : bas )
+	 */
 	public int directionAleatoire() {
 		int direction = OutilsJeu.valeurZeroAleatoire(4);
 		System.out.println("DIRECTION ALEATOIRE TIREE : " + direction);
 		return direction;
 	}
 
-	public boolean checkDeplacement(int indiceNavire, int directionDeplacement) {
+	/**
+	 * Methode servant a verifier si deplacement choisi aleatoirement est possible
+	 * 
+	 * @param indiceNavire:         Indice du Navire pour lequel on doit verifier
+	 * @param directionDeplacement: direction du navire
+	 *
+	 * @return Vrai si le navire est coule , Faux sinon
+	 */
+	public boolean checkDeplacementAleatoire(int indiceNavire, int directionDeplacement) {
 		ArrayList<Navire> listeNav = flotte.getListeNavire();
-		System.out.println(listeNav);
 
 		Navire navire = listeNav.get(indiceNavire);
 
@@ -831,6 +1065,13 @@ public class Joueur {
 		}
 	}
 
+	/**
+	 * Methode servant a verifier si le navire donnee en parametre est touche
+	 * 
+	 * @param indiceNavire: Indice du Navire pour lequel on doit verifier
+	 *
+	 * @return Vrai si le navire est touche , Faux sinon
+	 */
 	public boolean verifTouche(int indiceNavire) {
 		Navire navire = flotte.getListeNavire().get(indiceNavire);
 
@@ -841,6 +1082,13 @@ public class Joueur {
 		}
 	}
 
+	/**
+	 * Methode servant a verifier si le navire donnee en parametre est coule
+	 * 
+	 * @param indiceNavire: Indice du Navire pour lequel on doit verifier
+	 *
+	 * @return Vrai si le navire est coule , Faux sinon
+	 */
 	public boolean verifCoule(int indiceNavire) {
 		Navire navire = flotte.getListeNavire().get(indiceNavire);
 
@@ -851,7 +1099,15 @@ public class Joueur {
 		}
 	}
 
-	public boolean verifDeplacable(int indiceNavire) {
+	/**
+	 * Methode servant a savoir si le Navire donnee en parametre est touche et ou
+	 * coule
+	 * 
+	 * @param indiceNavire: Indice du Navire pour lequel on doit verifier
+	 *
+	 * @return Vrai si le navire est deplacable , Faux sinon
+	 */
+	public boolean verifNavireDeplacable(int indiceNavire) {
 		if ((verifTouche(indiceNavire) && verifCoule(indiceNavire))
 				|| (verifCoule(indiceNavire) || verifTouche(indiceNavire))) {
 			return false;
@@ -860,6 +1116,14 @@ public class Joueur {
 		}
 	}
 
+	/**
+	 * Methode servant a savoir si un navire avec l'id donne en parametre est encore
+	 * disponible
+	 * 
+	 * @param idNavire : Id du Navire qu'on recherche
+	 *
+	 * @return Vrai si un Navire de ce type est dispo | Faux sinon
+	 */
 	public boolean verifNavireDispo(int idNavire) {
 		ArrayList<Navire> listeNav = flotte.getListeNavire();
 
@@ -879,59 +1143,27 @@ public class Joueur {
 		}
 	}
 
+	/**
+	 * Methode servant a verifier s'il existe encore un navire qui n'a pas ete
+	 * touche
+	 * 
+	 *
+	 * @return Vrai si enccore un navire est deplacable , Faux sinon
+	 */
+	public boolean NbNavireDeplacable() {
+		ArrayList<Navire> listeNavires = flotte.getListeNavire();
+		int verif = 0;
+		for (Navire navire : listeNavires) {
+			if (!navire.isTouche()) {
+				verif++;
+			}
+		}
+		return verif > 0;
+	}
+
 	@Override
 	public String toString() {
 		return "Joueur [grilleJoueur=" + grilleJoueur + ", grilleEnnemi=" + grilleEnnemi + ", flotte=" + flotte + "]";
 	}
-
-	public boolean NbNavireDeplacable() {
-		ArrayList<Navire> listeNavires = flotte.getListeNavire();
-		int verif =0;
-		for (Navire navire : listeNavires) {
-			if(! navire.isTouche()) {
-				verif++;
-			}
-		}
-		return verif>0;
-	}
-
-//	public static void main(String[] args) {
-//		AffichageCLI afficheCLI = new AffichageCLI();
-//		
-//		Grille grilleJoueur = new Grille(ConfigurationJeu.NB_LIGNE, ConfigurationJeu.NB_COLONNE);
-//		Grille grilleRobot = new Grille(ConfigurationJeu.NB_LIGNE, ConfigurationJeu.NB_COLONNE);
-//
-//		Joueur j = new Joueur(grilleJoueur, grilleRobot);
-//		Joueur robot = new Joueur(grilleRobot, grilleJoueur);
-//
-//		System.out.println("\n-------------------------------------------------\n");
-//
-//		afficheCLI.afficheGrille(j.getGrilleJoueur());
-//
-//		System.out.println("\n-------------------------------------------------\n");
-//
-//		afficheCLI.afficheGrilleEnnemi(j.getGrilleEnnemi(), false);
-//
-//		System.out.println("\n-------------------------------------------------\n");
-//
-//		j.tirer(OutilsJeu.traduitCoordonnees("a 02"), 3);
-//
-//		afficheCLI.afficheGrilleEnnemi(j.getGrilleEnnemi(), false);
-//		
-//
-//		// TEST DEPLACEMENT
-//
-////		j.afficheFlotteNumerote();
-////		
-////		j.deplacer(1, 3);
-////		
-////		j.carteJoueur.afficheGrille();
-//
-////
-////		System.out.println("\n-------------------------------------------------\n");
-////
-////		j.carteJoueur.afficheGrille();
-//
-//	}
 
 }

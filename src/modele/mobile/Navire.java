@@ -7,6 +7,10 @@
  */
 package modele.mobile;
 
+/**
+ * Cette classe sert a la creqtion d'un objet Navire. Un joueur possede 7 Navires.
+ */
+
 import java.util.ArrayList;
 
 public class Navire {
@@ -19,12 +23,17 @@ public class Navire {
 	protected boolean touche;
 
 	/**
-	 * @param id : (1 : CUIRASSE | 2: CROISEUR | 3: DESTROYER | 4: SOUS-MARIN)
-	 * @param taille : (7 : CUIRASSE | 5: CROISEUR | 3: DESTROYER | 1: SOUS-MARIN)
-	 * @param impactMissile : (9 : CUIRASSE | 4: CROISEUR | 1: DESTROYER | 1: SOUS-MARIN)
+	 * Constructeur de la classe Navire 
+	 * @param id               : (1 : CUIRASSE | 2: CROISEUR | 3: DESTROYER | 4:
+	 *                         SOUS-MARIN)
+	 * @param taille           : (7 : CUIRASSE | 5: CROISEUR | 3: DESTROYER | 1:
+	 *                         SOUS-MARIN)
+	 * @param impactMissile    : (9 : CUIRASSE | 4: CROISEUR | 1: DESTROYER | 1:
+	 *                         SOUS-MARIN)
 	 * @param listeCoordonnees : Liste des coordonnes des blocs du Navire
-	 * @param coule : (True : Si tous les blocs du Navire sont coulees | False : sinon)
-	 * @param direction : (0 : HORIZONTALE | 1 : VERTICALE)
+	 * @param coule            : (Vrai : Si tous les blocs du Navire sont coulees |
+	 *                         Faux : sinon)
+	 * @param direction        : (0 : HORIZONTALE | 1 : VERTICALE)
 	 */
 	public Navire(ArrayList<Coordonnees> listeCoordonnees, int direction) {
 		this.listeCoordonnees = listeCoordonnees;
@@ -68,8 +77,14 @@ public class Navire {
 	public void setTouche(boolean touche) {
 		this.touche = touche;
 	}
-
-	public Coordonnees futuresCoordonneesValid(int directionDeplacement) {
+	/**
+	 * Methode servant a renvoyer la coordonnees du bloc en tete du Navire apres son deplacement dans la direction donnee
+	 * 
+	 * @param directionDeplacement : direction dans laquelle il faut deplacer le  Navire ( 0 : gauche | 1: haut | 2 : droite | 3 : bas )
+	 *
+	 * @return Les coordonnees du bloc en tete du navire apres son deplacement.
+	 */
+	public Coordonnees validationFuturesCoordonnees(int directionDeplacement) {
 		int coordLigne = 0;
 		int coordColonne = 0;
 		switch (directionDeplacement) {
@@ -95,21 +110,36 @@ public class Navire {
 			break;
 		}
 		default:
-			throw new IllegalArgumentException("Unexpected value: " + direction);
+			throw new IllegalArgumentException("Unexpected value: " + directionDeplacement);
 		}
 		return new Coordonnees(coordLigne, coordColonne);
 	}
 
+	/**
+	 * Methode servant a savoir si un Navire et deplacable dans la direction donnee en parametre
+	 * 
+	  * @param directionDeplacement   : direction dans laquelle il faut deplacer le  Navire ( 0 : gauche | 1: haut | 2 : droite | 3 : bas )
+	 *
+	 * @return Vrai : si le navire peut etre deplace dans la direction donnee 
+	 */
 	public boolean deplacable(int directionDeplacement) {
-		Coordonnees c = futuresCoordonneesValid(directionDeplacement);
+		Coordonnees c = validationFuturesCoordonnees(directionDeplacement);
 		if (c.valideCoordonnees()) {
-			System.out.println("Methode deplacable : True");
 			return true;
 		}
-		System.out.println("Methode deplacable : False");
 		return false;
 	}
 
+	/**
+	 * Methode servant a recuperer les coordonnees donnee en parametre apres le
+	 * deplacement dans la direction donnee en parametre
+	 * 
+	 * @param directionDeplacement   : direction dans laquelle il faut deplacer le  Navire ( 0 : gauche | 1: haut | 2 : droite | 3 : bas )
+	 *                            
+	 * @param c : Coordonnee du Navire avant deplacement
+	 *
+	 * @return La coordonnees du Navire après deplacement
+	 */
 	private Coordonnees MajCoordonnees(int directionDeplacement, Coordonnees c) {
 		int coordLigne = 0;
 		int coordColonne = 0;
@@ -141,45 +171,27 @@ public class Navire {
 		return new Coordonnees(coordLigne, coordColonne);
 	}
 
+	/**
+	 * Methode servant a deplacer un Navire dans la direction donne en parametre
+	 * 
+	 * @param directionDeplacement : direction dans laquelle il faut deplacer le
+	 *                             Navire ( 0 : gauche | 1: haut | 2 : droite | 3 :
+	 *                             bas )
+	 *
+	 */
 	public void deplacer(int directionDeplacement) {
 		if (deplacable(directionDeplacement)) {
 			for (int i = 0; i < listeCoordonnees.size(); i++) {
-				Coordonnees c = this.listeCoordonnees.get(i);
-				this.listeCoordonnees.set(i, MajCoordonnees(directionDeplacement, c));
+				Coordonnees c = listeCoordonnees.get(i);
+				listeCoordonnees.set(i, MajCoordonnees(directionDeplacement, c));
 			}
 		}
 	}
 
 	@Override
 	public String toString() {
-		return "\nNavire [id=" + id + ", taille=" + taille + ", impactMissile=" + impactMissile + ", listeCoordonnees="
-				+ listeCoordonnees + ", coule=" + coule + ", direction=" + direction + "]";
+		return "Navire [id=" + id + ", taille=" + taille + ", impactMissile=" + impactMissile + ", listeCoordonnees="
+				+ listeCoordonnees + ", coule=" + coule + ", direction=" + direction + ", touche=" + touche + "]";
 	}
-
-//	public static void main(String[] args) {
-//
-//		Coordonnees c1 = new Coordonnees(1, 1);
-//		Coordonnees c2 = new Coordonnees(1, 2);
-//		Coordonnees c3 = new Coordonnees(1, 3);
-//
-//		ArrayList<Coordonnees> c = new ArrayList<Coordonnees>();
-//		c.add(c1);
-//		c.add(c2);
-//		c.add(c3);
-//
-//		Navire n = new Navire(1, 3, 1, c, false, 0);
-//
-//		int deplacementDirection = 3;
-//
-//		System.out.println(n.getCoordonnees());
-//
-//		n.deplacer(deplacementDirection);
-//
-//		System.out.println(n.getCoordonnees());
-//
-//		n.tirer();
-//		n.estEndommage();
-//
-//	}
 
 }

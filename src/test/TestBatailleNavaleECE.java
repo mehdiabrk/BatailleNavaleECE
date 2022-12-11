@@ -7,7 +7,6 @@
  */
 package test;
 
-import config.ConfigurationJeu;
 import controleur.jeu.Controleur;
 
 public class TestBatailleNavaleECE {
